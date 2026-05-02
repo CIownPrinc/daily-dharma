@@ -3,6 +3,25 @@ import hanuman from "@/assets/story-hanuman.jpg";
 import sage from "@/assets/story-sage.jpg";
 import rama from "@/assets/story-rama.jpg";
 import ganesha from "@/assets/story-ganesha.jpg";
+import arjuna from "@/assets/story-arjuna.jpg";
+import draupadi from "@/assets/story-draupadi.jpg";
+import eklavya from "@/assets/story-eklavya.jpg";
+import savitri from "@/assets/story-savitri.jpg";
+import prahlad from "@/assets/story-prahlad.jpg";
+
+export type Choice = {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  feedback: string;
+};
+
+export type StoryPage = {
+  text: string;
+  image?: string;
+  choice?: Choice;
+  wisdom?: string;
+};
 
 export type Story = {
   slug: string;
@@ -12,7 +31,7 @@ export type Story = {
   image: string;
   blurb: string;
   lesson: string;
-  pages: { text: string; image?: string }[];
+  pages: StoryPage[];
   level: 1 | 2 | 3;
 };
 
