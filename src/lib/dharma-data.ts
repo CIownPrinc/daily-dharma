@@ -460,6 +460,21 @@ export const journey: { realm: string; nodes: JourneyNode[] }[] = [
     ],
   },
   {
+    realm: "Field of Kurukshetra",
+    nodes: [
+      { storySlug: "arjunas-choice", label: "The Choice" },
+      { storySlug: "draupadis-courage", label: "The Voice" },
+      { storySlug: "eklavyas-practice", label: "The Practice" },
+    ],
+  },
+  {
+    realm: "The Twilight Lands",
+    nodes: [
+      { storySlug: "savitri-and-the-stars", label: "The Quiet Walk" },
+      { storySlug: "prahlads-faith", label: "The Faith" },
+    ],
+  },
+  {
     realm: "The Quiet Hermitage",
     nodes: [{ storySlug: "sage-and-the-river", label: "The River" }],
   },
