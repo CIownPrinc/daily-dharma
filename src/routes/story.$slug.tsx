@@ -48,18 +48,27 @@ function StoryPage() {
   const { story } = Route.useLoaderData();
   const [pageIdx, setPageIdx] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [choiceIdx, setChoiceIdx] = useState<number | null>(null);
   const { completeStory } = useProgress();
 
   const page = story.pages[pageIdx]!;
   const isLast = pageIdx === story.pages.length - 1;
+  const choiceLocked = !!page.choice && choiceIdx === null;
 
   const next = () => {
+    if (choiceLocked) return;
     if (isLast) {
       completeStory(story.slug);
       setFinished(true);
     } else {
       setPageIdx((i) => i + 1);
+      setChoiceIdx(null);
     }
+  };
+
+  const back = () => {
+    setPageIdx((i) => Math.max(0, i - 1));
+    setChoiceIdx(null);
   };
 
   return (
@@ -94,6 +103,60 @@ function StoryPage() {
               {page.text}
             </p>
 
+            {/* Wisdom callout */}
+            {page.wisdom && (
+              <div className="mt-6 flex gap-4 items-start bg-lotus-soft rounded-2xl p-5 ring-1 ring-lotus/15">
+                <div className="text-3xl shrink-0" aria-hidden>🪔</div>
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-widest text-lotus mb-1">
+                    Wisdom of the Story
+                  </div>
+                  <p className="font-serif italic text-ink leading-snug">{page.wisdom}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Choice */}
+            {page.choice && (
+              <div className="mt-6 bg-jasmine/60 rounded-2xl p-5 ring-1 ring-ink/5">
+                <div className="font-bold text-ink mb-3 flex items-start gap-2">
+                  <span aria-hidden>🤔</span>
+                  <span>{page.choice.question}</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {page.choice.options.map((opt, i) => {
+                    const answered = choiceIdx !== null;
+                    const isCorrect = i === page.choice!.correctIndex;
+                    const isPicked = choiceIdx === i;
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => choiceIdx === null && setChoiceIdx(i)}
+                        disabled={answered}
+                        className={cn(
+                          "text-left px-4 py-3 rounded-xl font-medium text-ink ring-1 transition-colors",
+                          !answered && "bg-card ring-ink/10 hover:ring-lotus/40 hover:bg-lotus-soft cursor-pointer",
+                          answered && isCorrect && "bg-leaf-soft ring-leaf/40 text-ink",
+                          answered && !isCorrect && isPicked && "bg-card ring-ink/10 opacity-60",
+                          answered && !isCorrect && !isPicked && "bg-card ring-ink/10 opacity-50",
+                        )}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+                {choiceIdx !== null && (
+                  <div className="mt-4 text-sm text-ink leading-relaxed bg-leaf-soft/60 rounded-xl px-4 py-3">
+                    ✨ {choiceIdx === page.choice.correctIndex
+                      ? page.choice.feedback
+                      : `That's a kind thought too. ${page.choice.feedback}`}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Progress dots */}
             <div className="flex items-center gap-2 mt-8 mb-6">
               {story.pages.map((_, i) => (
@@ -109,7 +172,7 @@ function StoryPage() {
 
             <div className="flex items-center justify-between gap-3">
               <button
-                onClick={() => setPageIdx((i) => Math.max(0, i - 1))}
+                onClick={back}
                 disabled={pageIdx === 0}
                 className="px-5 py-3 rounded-full font-bold text-sm text-ink-soft hover:text-ink disabled:opacity-30"
               >
@@ -117,7 +180,11 @@ function StoryPage() {
               </button>
               <button
                 onClick={next}
-                className="bg-lotus text-primary-foreground px-7 py-3.5 rounded-full font-bold text-base hover:bg-lotus-deep transition-colors shadow-petal"
+                disabled={choiceLocked}
+                className={cn(
+                  "bg-lotus text-primary-foreground px-7 py-3.5 rounded-full font-bold text-base transition-colors shadow-petal",
+                  choiceLocked ? "opacity-50 cursor-not-allowed" : "hover:bg-lotus-deep",
+                )}
               >
                 {isLast ? "Finish the tale ✿" : "Turn the page →"}
               </button>
