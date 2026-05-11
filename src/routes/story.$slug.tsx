@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { stories, missions, type Story, type Mission } from "@/lib/dharma-data";
+import { Confetti } from "@/components/confetti";
 import { useProgress } from "@/lib/use-progress";
 import { cn } from "@/lib/utils";
 
@@ -219,7 +220,8 @@ function FinishView({ story }: { story: Story }) {
   const nextStory = idx >= 0 ? stories[(idx + 1) % stories.length] : null;
 
   return (
-    <article className="bg-card rounded-[2rem] ring-1 ring-ink/5 shadow-petal p-8 md:p-12">
+    <article className="bg-card rounded-[2rem] ring-1 ring-ink/5 shadow-petal p-8 md:p-12 relative">
+      <Confetti />
       <div className="text-center">
         <div className="text-5xl mb-4 animate-petal inline-block" aria-hidden>✿</div>
         <h2 className="font-serif text-3xl text-ink mb-3">A petal for you.</h2>

@@ -23,6 +23,20 @@ export type StoryPage = {
   wisdom?: string;
 };
 
+export type AgeStage = "Little" | "Curious" | "Seeker";
+
+export const AGE_STAGES: { id: AgeStage; label: string; range: string }[] = [
+  { id: "Little", label: "Little Ones", range: "ages 4–6" },
+  { id: "Curious", label: "Curious Hearts", range: "ages 7–9" },
+  { id: "Seeker", label: "Young Seekers", range: "ages 10+" },
+];
+
+export type Character = {
+  name: string;
+  emoji: string;
+  blurb: string;
+};
+
 export type Story = {
   slug: string;
   title: string;
@@ -33,6 +47,8 @@ export type Story = {
   lesson: string;
   pages: StoryPage[];
   level: 1 | 2 | 3;
+  ageStage: AgeStage;
+  character: Character;
 };
 
 export const stories: Story[] = [
@@ -46,6 +62,8 @@ export const stories: Story[] = [
       "Discover how young Krishna protected his village from a mighty storm — a story about caring for those we love.",
     lesson: "True strength is used to protect, not to harm.",
     level: 1,
+    ageStage: "Little",
+    character: { name: "Krishna", emoji: "🪈", blurb: "The flute-player who lifted a mountain to keep his village safe." },
     pages: [
       {
         text: "Long ago in a green village called Vrindavan, a boy named Krishna sat under a flowering tree, playing his flute.",
@@ -82,6 +100,8 @@ export const stories: Story[] = [
       "Hanuman stands at the edge of the world. Inside him, a quiet power waits to be remembered.",
     lesson: "Believe in yourself — your strength is bigger than you know.",
     level: 1,
+    ageStage: "Curious",
+    character: { name: "Hanuman", emoji: "🐒", blurb: "The brave one made of wind and devotion." },
     pages: [
       {
         text: "Hanuman stood at the very edge of the ocean. Far, far away was an island where his friend Sita waited to be found.",
@@ -118,6 +138,8 @@ export const stories: Story[] = [
       "Why does the wisest master in the village spend every morning simply watching the water flow?",
     lesson: "Stillness teaches us what hurry hides.",
     level: 2,
+    ageStage: "Curious",
+    character: { name: "The Old Sage", emoji: "🧘", blurb: "A quiet teacher who listens to the river." },
     pages: [
       { text: "In a quiet hermitage by a clear river lived an old sage with a long white beard.", image: sage },
       {
@@ -147,6 +169,8 @@ export const stories: Story[] = [
       "Even princes must learn from the forest — about kindness, patience, and keeping a promise.",
     lesson: "A promise kept is worth more than a crown.",
     level: 2,
+    ageStage: "Little",
+    character: { name: "Rama", emoji: "🏹", blurb: "A prince who keeps every promise, even small ones." },
     pages: [
       { text: "Prince Rama walked through a great forest. He had given up his kingdom to keep a promise to his father.", image: rama },
       { text: "A small deer stepped out from the trees. It was hungry and afraid." },
@@ -176,6 +200,8 @@ export const stories: Story[] = [
       "How a tiny mouse became the best friend of a great elephant — a story about not judging by size.",
     lesson: "Big or small, every friend matters.",
     level: 1,
+    ageStage: "Little",
+    character: { name: "Ganesha", emoji: "🐘", blurb: "The kind elephant who sees every friend, big or small." },
     pages: [
       { text: "In a garden of pink lotuses lived Ganesha — kind, wise, and shaped like a friendly elephant.", image: ganesha },
       {
@@ -205,6 +231,8 @@ export const stories: Story[] = [
       "Two armies. One brave heart. And a quiet question whispered between them: what is the right thing to do?",
     lesson: "Dharma means doing what is right, even when it is difficult.",
     level: 3,
+    ageStage: "Seeker",
+    character: { name: "Arjuna", emoji: "🎯", blurb: "A great archer who learned that feeling deeply is part of being brave." },
     pages: [
       {
         text: "Two great armies stood facing each other on the wide field of Kurukshetra. The morning was very still.",
@@ -238,6 +266,8 @@ export const stories: Story[] = [
       "When no one else dared to speak, one princess stood very still — and let the truth be heard.",
     lesson: "Courage is speaking the truth, even when your voice trembles.",
     level: 3,
+    ageStage: "Seeker",
+    character: { name: "Draupadi", emoji: "👑", blurb: "A princess whose quiet voice could shake a hall." },
     pages: [
       {
         text: "Draupadi was a princess known not for her crown, but for her wisdom and her clear, brave heart.",
@@ -271,6 +301,8 @@ export const stories: Story[] = [
       "A boy with no teacher, no school, no help — and yet he became one of the greatest archers of all.",
     lesson: "Dedication is the greatest teacher.",
     level: 2,
+    ageStage: "Curious",
+    character: { name: "Eklavya", emoji: "🪶", blurb: "A boy who taught himself with patience and clay." },
     pages: [
       {
         text: "Eklavya was a boy from a forest village who dreamed of becoming a great archer. But no teacher would take him as a student.",
@@ -304,6 +336,8 @@ export const stories: Story[] = [
       "When a great being came to take what she loved, Savitri did the bravest thing of all — she simply followed.",
     lesson: "Love and wisdom together can soften any heart.",
     level: 3,
+    ageStage: "Seeker",
+    character: { name: "Savitri", emoji: "🌙", blurb: "A wise princess who walked beside the stars." },
     pages: [
       {
         text: "Savitri was a princess so wise and so loving that even the stars were said to listen when she spoke.",
@@ -337,6 +371,8 @@ export const stories: Story[] = [
       "A small boy whose heart was so full of love that nothing could shake him.",
     lesson: "True faith is gentle, steady, and made of love.",
     level: 2,
+    ageStage: "Curious",
+    character: { name: "Prahlad", emoji: "🪷", blurb: "A small boy whose loving heart could not be shaken." },
     pages: [
       {
         text: "Prahlad was a young boy whose father was a powerful king who did not believe in the divine.",

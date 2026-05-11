@@ -1,7 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import type { Story } from "@/lib/dharma-data";
 
-export function StoryCard({ story, featured = false }: { story: Story; featured?: boolean }) {
+export function StoryCard({
+  story,
+  featured = false,
+  done = false,
+}: {
+  story: Story;
+  featured?: boolean;
+  done?: boolean;
+}) {
   if (featured) {
     return (
       <Link
@@ -40,9 +48,9 @@ export function StoryCard({ story, featured = false }: { story: Story; featured?
     <Link
       to="/story/$slug"
       params={{ slug: story.slug }}
-      className="group block bg-card rounded-3xl p-3 ring-1 ring-ink/5 shadow-soft hover:shadow-petal transition-shadow"
+      className="group block bg-card rounded-3xl p-3 ring-1 ring-ink/5 shadow-soft hover:shadow-petal transition-shadow relative"
     >
-      <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-lotus-soft mb-4">
+      <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-lotus-soft mb-4 relative">
         <img
           src={story.image}
           alt={story.title}
@@ -51,6 +59,17 @@ export function StoryCard({ story, featured = false }: { story: Story; featured?
           loading="lazy"
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
+        <span className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-widest bg-card/90 text-ink-soft px-2 py-0.5 rounded-full ring-1 ring-ink/5">
+          {story.ageStage}
+        </span>
+        {done && (
+          <span
+            className="absolute top-2 right-2 size-7 rounded-full bg-leaf text-primary-foreground flex items-center justify-center text-xs font-bold shadow-petal"
+            aria-label="Finished"
+          >
+            ✓
+          </span>
+        )}
       </div>
       <div className="px-3 pb-3">
         <div className="text-[11px] font-bold uppercase tracking-widest text-lotus mb-1">
