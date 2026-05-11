@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { StreakBadge } from "@/components/streak-badge";
+import { LevelCard } from "@/components/level-card";
 import { useProgress } from "@/lib/use-progress";
 import { stories } from "@/lib/dharma-data";
 
@@ -34,6 +35,10 @@ function SanctuaryPage() {
         </h1>
       </header>
 
+      <div className="mb-6">
+        <LevelCard />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
         <div className="md:col-span-1">
           <StreakBadge />
@@ -41,6 +46,29 @@ function SanctuaryPage() {
         <Stat label="Tales Finished" value={hydrated ? progress.completedStories.length : 0} accent="leaf" />
         <Stat label="Missions Today" value={todayCount} accent="saffron" />
       </div>
+
+      {hydrated && Object.keys(progress.reflections).length > 0 && (
+        <section className="mb-10">
+          <h2 className="font-serif text-xl text-ink mb-4">Your reflections</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Object.entries(progress.reflections).map(([slug, r]) => {
+              const s = stories.find((x) => x.slug === slug);
+              if (!s) return null;
+              return (
+                <div key={slug} className="bg-card rounded-2xl p-5 ring-1 ring-ink/5 shadow-soft">
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-lotus mb-1">
+                    {r.date}
+                  </div>
+                  <h3 className="font-serif text-lg text-ink mb-2">{s.title}</h3>
+                  <p className="font-serif italic text-ink-soft text-[15px] leading-relaxed">
+                    "{r.text}"
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <section className="mb-10">
         <h2 className="font-serif text-xl text-ink mb-4">Tales you've heard</h2>

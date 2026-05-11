@@ -4,6 +4,8 @@ import { StoryCard } from "@/components/story-card";
 import { MissionCard } from "@/components/mission-card";
 import { ChantCard } from "@/components/chant-card";
 import { StreakBadge } from "@/components/streak-badge";
+import { LevelCard } from "@/components/level-card";
+import { OmBreathing } from "@/components/om-breathing";
 import { stories, missions, chants } from "@/lib/dharma-data";
 
 export const Route = createFileRoute("/")({
@@ -36,13 +38,21 @@ function HomePage() {
         </div>
       </header>
 
+      <section className="mb-6 md:mb-8">
+        <LevelCard />
+      </section>
+
       <section className="mb-8 md:mb-10">
         <StoryCard story={story} featured />
       </section>
 
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-10">
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-6">
         <MissionCard mission={mission} />
         <ChantCard chant={chant} />
+      </section>
+
+      <section className="mb-10">
+        <OmBreathing />
       </section>
 
       <section>

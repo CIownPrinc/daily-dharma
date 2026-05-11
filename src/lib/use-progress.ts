@@ -10,6 +10,7 @@ export type Progress = {
   completedMissions: string[]; // includes date suffix yyyy-mm-dd
   todaysMissionId: string | null;
   todaysMissionDate: string | null;
+  reflections: Record<string, { text: string; date: string }>;
 };
 
 const initial: Progress = {
@@ -20,6 +21,7 @@ const initial: Progress = {
   completedMissions: [],
   todaysMissionId: null,
   todaysMissionDate: null,
+  reflections: {},
 };
 
 function todayStr() {
@@ -48,7 +50,6 @@ export function useProgress() {
 
   useEffect(() => {
     const p = load();
-    // Update streak on first visit per day
     const today = todayStr();
     if (p.lastVisit !== today) {
       const yesterday = new Date();
@@ -89,5 +90,29 @@ export function useProgress() {
   const isMissionCompletedToday = (id: string) =>
     progress.completedMissions.includes(`${id}:${todayStr()}`);
 
-  return { progress, hydrated, completeStory, completeMission, isMissionCompletedToday, update };
+  const saveReflection = (slug: string, text: string) => {
+    const trimmed = text.trim();
+    update((p) => {
+      const had = !!p.reflections[slug];
+      const reflections = { ...p.reflections };
+      if (!trimmed) {
+        delete reflections[slug];
+        return { ...p, reflections };
+      }
+      reflections[slug] = { text: trimmed, date: todayStr() };
+      // Award 1 petal the first time a reflection is written for a story
+      const petals = had ? p.petals : p.petals + 1;
+      return { ...p, reflections, petals };
+    });
+  };
+
+  return {
+    progress,
+    hydrated,
+    completeStory,
+    completeMission,
+    isMissionCompletedToday,
+    saveReflection,
+    update,
+  };
 }
