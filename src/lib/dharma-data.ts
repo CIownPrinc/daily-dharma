@@ -23,6 +23,20 @@ export type StoryPage = {
   wisdom?: string;
 };
 
+export type AgeStage = "Little" | "Curious" | "Seeker";
+
+export const AGE_STAGES: { id: AgeStage; label: string; range: string }[] = [
+  { id: "Little", label: "Little Ones", range: "ages 4–6" },
+  { id: "Curious", label: "Curious Hearts", range: "ages 7–9" },
+  { id: "Seeker", label: "Young Seekers", range: "ages 10+" },
+];
+
+export type Character = {
+  name: string;
+  emoji: string;
+  blurb: string;
+};
+
 export type Story = {
   slug: string;
   title: string;
@@ -33,6 +47,8 @@ export type Story = {
   lesson: string;
   pages: StoryPage[];
   level: 1 | 2 | 3;
+  ageStage: AgeStage;
+  character: Character;
 };
 
 export const stories: Story[] = [
