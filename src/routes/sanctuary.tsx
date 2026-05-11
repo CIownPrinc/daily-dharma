@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { StreakBadge } from "@/components/streak-badge";
 import { LevelCard } from "@/components/level-card";
+import { CharacterGallery } from "@/components/character-gallery";
 import { useProgress } from "@/lib/use-progress";
 import { stories } from "@/lib/dharma-data";
 
