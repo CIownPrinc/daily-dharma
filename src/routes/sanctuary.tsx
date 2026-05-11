@@ -71,6 +71,8 @@ function SanctuaryPage() {
         </section>
       )}
 
+      <CharacterGallery />
+
       <section className="mb-10">
         <h2 className="font-serif text-xl text-ink mb-4">Tales you've heard</h2>
         {finished.length === 0 ? (
