@@ -111,6 +111,30 @@ function StoryPage() {
               {page.text}
             </p>
 
+            {narrator.supported && (
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (narrator.speaking) narrator.stop();
+                    else narrator.speak([page.text, page.wisdom].filter(Boolean).join(". "));
+                  }}
+                  className={cn(
+                    "inline-flex items-center gap-2 text-sm font-bold rounded-full px-4 py-2 ring-1 transition-colors",
+                    narrator.speaking
+                      ? "bg-lotus text-primary-foreground ring-lotus shadow-petal"
+                      : "bg-jasmine/70 text-ink ring-ink/10 hover:bg-lotus-soft hover:ring-lotus/30",
+                  )}
+                  aria-label={narrator.speaking ? "Stop narration" : "Listen to this page"}
+                >
+                  <span aria-hidden className={narrator.speaking ? "animate-gentle-pulse" : ""}>
+                    {narrator.speaking ? "⏸" : "🔊"}
+                  </span>
+                  {narrator.speaking ? "Pause story" : "Read to me"}
+                </button>
+              </div>
+            )}
+
             {page.wisdom && (
               <div className="mt-6 flex gap-4 items-start bg-lotus-soft rounded-2xl p-5 ring-1 ring-lotus/15">
                 <div className="text-3xl shrink-0" aria-hidden>🪔</div>
