@@ -46,8 +46,9 @@ function ParentDashboard() {
   const { progress, hydrated } = useProgress();
   const { profile } = useProfile();
   const finished = stories.filter((s) => progress.completedStories.includes(s.slug));
-  const level = levelFor(progress.petals);
-  const next = nextThreshold(progress.petals);
+  const level = getLevel(progress.petals);
+  const petalsToGo = level.next ? Math.max(0, level.next - progress.petals) : 0;
+  const nextName = level.index === 0 ? "Disciple" : level.index === 1 ? "Dharma Keeper" : null;
 
   return (
     <AppShell>
