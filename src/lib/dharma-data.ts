@@ -8,6 +8,9 @@ import draupadi from "@/assets/story-draupadi.jpg";
 import eklavya from "@/assets/story-eklavya.jpg";
 import savitri from "@/assets/story-savitri.jpg";
 import prahlad from "@/assets/story-prahlad.jpg";
+import dhruva from "@/assets/story-dhruva.jpg";
+import nachiketa from "@/assets/story-nachiketa.jpg";
+import markandeya from "@/assets/story-markandeya.jpg";
 
 export type Choice = {
   question: string;
@@ -396,6 +399,117 @@ export const stories: Story[] = [
       },
     ],
   },
+  {
+    slug: "dhruva-and-the-pole-star",
+    title: "Dhruva and the Pole Star",
+    realm: "The Eternal Sky",
+    duration: "4 min",
+    image: dhruva,
+    blurb:
+      "A small boy walks alone into the forest with one quiet wish — and the whole sky listens.",
+    lesson: "A steady heart shines longer than the brightest star.",
+    level: 2,
+    ageStage: "Curious",
+    character: { name: "Dhruva", emoji: "⭐", blurb: "A boy whose quiet devotion became a star that never moves." },
+    pages: [
+      {
+        text: "Dhruva was a small boy with a big sadness in his heart. He wished, more than anything, to be truly seen and loved.",
+        image: dhruva,
+      },
+      {
+        text: "He walked alone into the forest. There, a wise sage taught him a single word to whisper, and a way of breathing slowly.",
+        choice: {
+          question: "What did Dhruva do, all alone in the forest?",
+          options: ["🧘 He sat very still and prayed", "😢 He gave up", "🏃 He ran home"],
+          correctIndex: 0,
+          feedback: "Yes — quiet, steady practice can move even the stars.",
+        },
+      },
+      {
+        text: "Days became months. Dhruva sat so still that birds rested on his shoulders. He never stopped his quiet whisper.",
+      },
+      {
+        text: "The sky itself began to shine for him. A soft voice said, 'Dhruva, your steady heart has touched the heavens.'",
+      },
+      {
+        text: "Dhruva was placed in the night sky as the Pole Star — the one star that never moves, guiding every traveler home.",
+        wisdom: "A steady heart shines longer than the brightest star.",
+      },
+    ],
+  },
+  {
+    slug: "nachiketas-questions",
+    title: "Nachiketa's Big Questions",
+    realm: "The Eternal Sky",
+    duration: "4 min",
+    image: nachiketa,
+    blurb:
+      "A curious boy walks straight up to the keeper of all endings — just to ask the question grown-ups are afraid to ask.",
+    lesson: "Asking real questions is the beginning of real wisdom.",
+    level: 3,
+    ageStage: "Seeker",
+    character: { name: "Nachiketa", emoji: "❓", blurb: "A bright boy whose questions opened the doors of wisdom." },
+    pages: [
+      {
+        text: "Nachiketa was a bright boy who loved his father very much. One day, he asked a question his father didn't want to answer.",
+        image: nachiketa,
+      },
+      {
+        text: "Instead of being upset, Nachiketa walked all the way to the great hall of Yama, the gentle keeper of endings, and waited politely for three days.",
+        choice: {
+          question: "What did Nachiketa ask Yama for?",
+          options: ["📜 The truth about life", "🪙 Lots of gold", "🏰 A big kingdom"],
+          correctIndex: 0,
+          feedback: "Yes! He cared more about understanding than about treasure.",
+        },
+      },
+      {
+        text: "Yama smiled. 'I will give you anything you wish — gold, kingdoms, long life. Just don't ask me your hard question.'",
+      },
+      {
+        text: "But Nachiketa shook his head gently. 'I don't want gold. I want to understand what is true.'",
+      },
+      {
+        text: "Yama was so moved that he taught the boy the deepest secrets — that what is real inside us never ends.",
+        wisdom: "Asking real questions, with a kind heart, opens the deepest doors.",
+      },
+    ],
+  },
+  {
+    slug: "markandeya-and-time",
+    title: "Markandeya and the River of Time",
+    realm: "The Eternal Sky",
+    duration: "3 min",
+    image: markandeya,
+    blurb:
+      "When even Time itself came knocking, one small boy held on to what he loved — and discovered something stronger than endings.",
+    lesson: "Love is the one thing that time cannot take.",
+    level: 3,
+    ageStage: "Seeker",
+    character: { name: "Markandeya", emoji: "⏳", blurb: "A small boy whose love was older than time itself." },
+    pages: [
+      {
+        text: "Markandeya was a kind little boy who loved sitting in the temple, hugging the smooth stone of Shiva, singing softly.",
+        image: markandeya,
+      },
+      {
+        text: "One day, the gentle figure of Time came to take him away. Markandeya didn't run. He held on tighter to the stone he loved.",
+        choice: {
+          question: "What gave Markandeya his courage?",
+          options: ["💛 His love", "🏃 Running fast", "🤐 Hiding"],
+          correctIndex: 0,
+          feedback: "Yes — love is older and stronger than even time itself.",
+        },
+      },
+      {
+        text: "A great warmth filled the temple. Shiva himself appeared and said, 'A heart this loving cannot be carried away by time.'",
+      },
+      {
+        text: "Markandeya was blessed to stay forever young. The river of time still flows — but love stands gently outside of it.",
+        wisdom: "Love is the one thing that time cannot take.",
+      },
+    ],
+  },
 ];
 
 export type Mission = {
@@ -513,5 +627,13 @@ export const journey: { realm: string; nodes: JourneyNode[] }[] = [
   {
     realm: "The Quiet Hermitage",
     nodes: [{ storySlug: "sage-and-the-river", label: "The River" }],
+  },
+  {
+    realm: "The Eternal Sky",
+    nodes: [
+      { storySlug: "dhruva-and-the-pole-star", label: "The Pole Star" },
+      { storySlug: "nachiketas-questions", label: "The Question" },
+      { storySlug: "markandeya-and-time", label: "The River of Time" },
+    ],
   },
 ];

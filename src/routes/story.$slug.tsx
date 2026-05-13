@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { stories, missions, type Story, type Mission } from "@/lib/dharma-data";
 import { Confetti } from "@/components/confetti";
 import { useProgress } from "@/lib/use-progress";
+import { useNarrator } from "@/lib/use-narrator";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/story/$slug")({
@@ -51,6 +52,12 @@ function StoryPage() {
   const [finished, setFinished] = useState(false);
   const [choiceIdx, setChoiceIdx] = useState<number | null>(null);
   const { completeStory } = useProgress();
+  const narrator = useNarrator();
+
+  // Stop narration when changing page or unmounting
+  useEffect(() => {
+    return () => narrator.stop();
+  }, [pageIdx, narrator]);
 
   const page = story.pages[pageIdx]!;
   const isLast = pageIdx === story.pages.length - 1;
@@ -103,6 +110,30 @@ function StoryPage() {
             <p className="font-serif text-lg md:text-xl text-ink leading-relaxed text-pretty min-h-[6rem]">
               {page.text}
             </p>
+
+            {narrator.supported && (
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (narrator.speaking) narrator.stop();
+                    else narrator.speak([page.text, page.wisdom].filter(Boolean).join(". "));
+                  }}
+                  className={cn(
+                    "inline-flex items-center gap-2 text-sm font-bold rounded-full px-4 py-2 ring-1 transition-colors",
+                    narrator.speaking
+                      ? "bg-lotus text-primary-foreground ring-lotus shadow-petal"
+                      : "bg-jasmine/70 text-ink ring-ink/10 hover:bg-lotus-soft hover:ring-lotus/30",
+                  )}
+                  aria-label={narrator.speaking ? "Stop narration" : "Listen to this page"}
+                >
+                  <span aria-hidden className={narrator.speaking ? "animate-gentle-pulse" : ""}>
+                    {narrator.speaking ? "⏸" : "🔊"}
+                  </span>
+                  {narrator.speaking ? "Pause story" : "Read to me"}
+                </button>
+              </div>
+            )}
 
             {page.wisdom && (
               <div className="mt-6 flex gap-4 items-start bg-lotus-soft rounded-2xl p-5 ring-1 ring-lotus/15">
