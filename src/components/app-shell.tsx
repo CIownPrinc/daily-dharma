@@ -1,5 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import { ProfileOnboarding } from "@/components/profile-onboarding";
+import { useProfile } from "@/lib/use-profile";
 
 const items = [
   { to: "/", label: "Today", icon: "☀" },
@@ -10,9 +12,11 @@ const items = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
+  const { profile } = useProfile();
 
   return (
     <div className="min-h-dvh bg-page-glow text-foreground">
+      <ProfileOnboarding />
       {/* Top header on mobile, sidebar on desktop */}
       <header className="md:hidden sticky top-0 z-20 backdrop-blur bg-jasmine/80 border-b border-border/50">
         <div className="px-5 py-4 flex items-center justify-between">
@@ -20,6 +24,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <LotusMark />
             <span className="font-serif text-lg text-lotus">Dharma Quest</span>
           </Link>
+          {profile && (
+            <Link to="/sanctuary" className="flex items-center gap-2 bg-lotus-soft rounded-full pl-1 pr-3 py-1 ring-1 ring-lotus/15">
+              <span className="text-xl" aria-hidden>{profile.avatar}</span>
+              <span className="text-xs font-bold text-ink truncate max-w-[6rem]">{profile.name}</span>
+            </Link>
+          )}
         </div>
       </header>
 
