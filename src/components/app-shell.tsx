@@ -63,6 +63,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               );
             })}
           </nav>
+          {profile && (
+            <div className="mt-auto bg-card rounded-2xl p-3 ring-1 ring-ink/5 flex items-center gap-3">
+              <span className="text-2xl" aria-hidden>{profile.avatar}</span>
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-ink truncate">{profile.name}</div>
+                <Link to="/parents" className="text-[10px] font-bold text-lotus hover:underline">
+                  For grown-ups →
+                </Link>
+              </div>
+            </div>
+          )}
+          {!profile && (
+            <Link to="/parents" className="text-[11px] font-bold text-ink-soft hover:text-lotus mt-auto">
+              For grown-ups →
+            </Link>
+          )}
         </aside>
 
         {/* Main */}
