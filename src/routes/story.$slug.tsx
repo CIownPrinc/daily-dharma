@@ -52,6 +52,12 @@ function StoryPage() {
   const [finished, setFinished] = useState(false);
   const [choiceIdx, setChoiceIdx] = useState<number | null>(null);
   const { completeStory } = useProgress();
+  const narrator = useNarrator();
+
+  // Stop narration when changing page or unmounting
+  useEffect(() => {
+    return () => narrator.stop();
+  }, [pageIdx, narrator]);
 
   const page = story.pages[pageIdx]!;
   const isLast = pageIdx === story.pages.length - 1;
