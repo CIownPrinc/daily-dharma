@@ -5,7 +5,7 @@ import { ParentGate } from "@/components/parent-gate";
 import { useProgress } from "@/lib/use-progress";
 import { useProfile } from "@/lib/use-profile";
 import { stories } from "@/lib/dharma-data";
-import { levelFor, nextThreshold } from "@/lib/levels";
+import { getLevel } from "@/lib/levels";
 
 export const Route = createFileRoute("/parents")({
   head: () => ({
@@ -70,11 +70,11 @@ function ParentDashboard() {
         <Stat label="Level" value={level.name} />
       </section>
 
-      {next && hydrated && (
+      {nextName && hydrated && (
         <section className="mb-10 bg-leaf-soft rounded-3xl p-5 ring-1 ring-leaf/15">
           <p className="text-sm text-ink-soft font-medium">
-            <span className="font-bold text-ink">{next.petalsToGo} more petals</span> until they
-            become a <span className="font-bold text-leaf-deep">{next.next.name}</span>.
+            <span className="font-bold text-ink">{petalsToGo} more petals</span> until they
+            become a <span className="font-bold text-leaf-deep">{nextName}</span>.
           </p>
         </section>
       )}

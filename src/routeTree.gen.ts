@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SanctuaryRouteImport } from './routes/sanctuary'
+import { Route as ParentsRouteImport } from './routes/parents'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as JourneyRouteImport } from './routes/journey'
 import { Route as IndexRouteImport } from './routes/index'
@@ -18,6 +19,11 @@ import { Route as StorySlugRouteImport } from './routes/story.$slug'
 const SanctuaryRoute = SanctuaryRouteImport.update({
   id: '/sanctuary',
   path: '/sanctuary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParentsRoute = ParentsRouteImport.update({
+  id: '/parents',
+  path: '/parents',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryRoute = LibraryRouteImport.update({
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/journey': typeof JourneyRoute
   '/library': typeof LibraryRoute
+  '/parents': typeof ParentsRoute
   '/sanctuary': typeof SanctuaryRoute
   '/story/$slug': typeof StorySlugRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/journey': typeof JourneyRoute
   '/library': typeof LibraryRoute
+  '/parents': typeof ParentsRoute
   '/sanctuary': typeof SanctuaryRoute
   '/story/$slug': typeof StorySlugRoute
 }
@@ -60,21 +68,36 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/journey': typeof JourneyRoute
   '/library': typeof LibraryRoute
+  '/parents': typeof ParentsRoute
   '/sanctuary': typeof SanctuaryRoute
   '/story/$slug': typeof StorySlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/journey' | '/library' | '/sanctuary' | '/story/$slug'
+  fullPaths:
+    | '/'
+    | '/journey'
+    | '/library'
+    | '/parents'
+    | '/sanctuary'
+    | '/story/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/journey' | '/library' | '/sanctuary' | '/story/$slug'
-  id: '__root__' | '/' | '/journey' | '/library' | '/sanctuary' | '/story/$slug'
+  to: '/' | '/journey' | '/library' | '/parents' | '/sanctuary' | '/story/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/journey'
+    | '/library'
+    | '/parents'
+    | '/sanctuary'
+    | '/story/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   JourneyRoute: typeof JourneyRoute
   LibraryRoute: typeof LibraryRoute
+  ParentsRoute: typeof ParentsRoute
   SanctuaryRoute: typeof SanctuaryRoute
   StorySlugRoute: typeof StorySlugRoute
 }
@@ -86,6 +109,13 @@ declare module '@tanstack/react-router' {
       path: '/sanctuary'
       fullPath: '/sanctuary'
       preLoaderRoute: typeof SanctuaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parents': {
+      id: '/parents'
+      path: '/parents'
+      fullPath: '/parents'
+      preLoaderRoute: typeof ParentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library': {
@@ -123,6 +153,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   JourneyRoute: JourneyRoute,
   LibraryRoute: LibraryRoute,
+  ParentsRoute: ParentsRoute,
   SanctuaryRoute: SanctuaryRoute,
   StorySlugRoute: StorySlugRoute,
 }
