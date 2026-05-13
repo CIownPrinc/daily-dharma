@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { stories, missions, type Story, type Mission } from "@/lib/dharma-data";
 import { Confetti } from "@/components/confetti";
 import { useProgress } from "@/lib/use-progress";
+import { useNarrator } from "@/lib/use-narrator";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/story/$slug")({
