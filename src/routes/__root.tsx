@@ -36,7 +36,7 @@ export const Route = createRootRoute({
         content:
           "A gentle daily app teaching children Hinduism through interactive stories, small habits, and sacred sounds.",
       },
-      { property: "og:title", content: "Dharma Quest" },
+      { property: "og:title", content: "Dharma Quest — Stories, habits, and wonder for kids" },
       {
         property: "og:description",
         content:
@@ -44,6 +44,12 @@ export const Route = createRootRoute({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Dharma Quest — Stories, habits, and wonder for kids" },
+      { name: "description", content: "Daily Dharma teaches kids Hinduism through interactive stories, daily habits, and a gamified progression system." },
+      { property: "og:description", content: "Daily Dharma teaches kids Hinduism through interactive stories, daily habits, and a gamified progression system." },
+      { name: "twitter:description", content: "Daily Dharma teaches kids Hinduism through interactive stories, daily habits, and a gamified progression system." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/aac40cab-982b-44bf-95da-58c9801e7cf5/id-preview-53f80e5a--cbcb37fb-c3e8-4edb-8239-21850861ce70.lovable.app-1778993903527.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/aac40cab-982b-44bf-95da-58c9801e7cf5/id-preview-53f80e5a--cbcb37fb-c3e8-4edb-8239-21850861ce70.lovable.app-1778993903527.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
