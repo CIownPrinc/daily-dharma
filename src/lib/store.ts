@@ -1,47 +1,33 @@
 /**
- * Central application store using Zustand with localStorage persistence.
+ * Central application store — Zustand with localStorage persistence.
  *
- * ARCHITECTURAL DECISION: Why Zustand instead of keeping useProgress/useProfile?
+ * Slices:
+ *   profile   — name, avatar, ageStage, createdAt
+ *   progress  — petals, streak, completedStories, reflections, earnedBadges, ...
+ *   settings  — narrator on/off, darkMode, ageStageOverride (parent-set)
  *
- * The original dual-hook pattern (useProgress + useProfile) creates two problems:
- *   1. Multiple components calling useProgress() each get their own useState
- *      instance. While they all read from the same localStorage key, they are
- *      NOT synchronized — a mutation in one component triggers a re-render only
- *      in that component's hook instance. This causes stale-read bugs as the app
- *      grows and more components subscribe to progress state.
- *   2. The narrator stops on route change because it's scoped to a component
- *      lifecycle. We need a store-level singleton for audio.
- *
- * Zustand with the persist middleware solves both:
- *   - Single in-memory state shared across all subscribers
- *   - React's useSyncExternalStore under the hood — all subscribers update atomically
- *   - Persistence is declarative, not imperative
- *   - Selectors prevent unnecessary re-renders
- *
- * MIGRATION STRATEGY: The existing useProgress and useProfile hooks are kept as
- * thin compatibility shims (see bottom of this file and the original hook files).
- * This means zero changes are needed in route files for Phase 1. The shims delegate
- * to this store, so the store is the single source of truth immediately.
- *
- * TRADEOFF: Zustand adds ~3KB gzipped to the bundle. This is acceptable given it
- * eliminates a class of state-sync bugs and enables the narrator singleton pattern.
+ * Phase 3 additions:
+ *   - settings slice with narratorEnabled, darkMode, ageStageOverride
+ *   - Profile gains ageStage (was optional, now always set during onboarding)
+ *   - toggleDarkMode applies/removes the "dark" class on <html> and persists
  */
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { Avatar } from "@/lib/use-profile";
+import type { AgeStage } from "@/lib/dharma-data";
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
 export type Profile = {
   name: string;
   avatar: Avatar;
-  ageStage: "Little" | "Curious" | "Seeker";
+  ageStage: AgeStage;
   createdAt: string;
 };
 
 export type EarnedBadge = {
-  slug: string; // story slug this badge came from
+  slug: string;
   name: string;
   icon: string;
   virtue: string;
@@ -53,30 +39,50 @@ export type Progress = {
   streak: number;
   lastVisit: string | null;
   completedStories: string[];
-  completedMissions: string[]; // format: "missionId:yyyy-mm-dd"
+  completedMissions: string[];
   reflections: Record<string, { text: string; date: string }>;
   earnedBadges: EarnedBadge[];
+};
+
+export type Settings = {
+  /** Whether the Web Speech API narrator auto-reads story pages */
+  narratorEnabled: boolean;
+  /** Dark mode — applied as class on <html> */
+  darkMode: boolean;
+  /**
+   * Parent-overridden age stage. When set, the library uses this instead of
+   * profile.ageStage. Allows a parent to adjust the filter without changing
+   * the child's profile identity.
+   */
+  ageStageOverride: AgeStage | null;
 };
 
 // ─── STORE SHAPE ──────────────────────────────────────────────────────────────
 
 type DharmaStore = {
-  // Profile slice
+  // Profile
   profile: Profile | null;
   profileHydrated: boolean;
   saveProfile: (p: Profile) => void;
   clearProfile: () => void;
 
-  // Progress slice
+  // Progress
   progress: Progress;
   progressHydrated: boolean;
   completeStory: (slug: string, badge?: EarnedBadge) => void;
   completeMission: (id: string) => void;
   isMissionCompletedToday: (id: string) => boolean;
   saveReflection: (slug: string, text: string) => void;
-
-  // Internal: called on first hydration to update streak
   _hydrateProgress: () => void;
+
+  // Settings
+  settings: Settings;
+  setNarratorEnabled: (v: boolean) => void;
+  toggleDarkMode: () => void;
+  setDarkMode: (v: boolean) => void;
+  setAgeStageOverride: (v: AgeStage | null) => void;
+  /** Resolved age stage: override → profile → default "Curious" */
+  resolvedAgeStage: () => AgeStage;
 };
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
@@ -91,6 +97,12 @@ function yesterdayStr() {
   return d.toISOString().slice(0, 10);
 }
 
+/** Apply or remove the "dark" class on <html> */
+function applyDarkMode(dark: boolean) {
+  if (typeof document === "undefined") return;
+  document.documentElement.classList.toggle("dark", dark);
+}
+
 const initialProgress: Progress = {
   petals: 0,
   streak: 0,
@@ -99,6 +111,12 @@ const initialProgress: Progress = {
   completedMissions: [],
   reflections: {},
   earnedBadges: [],
+};
+
+const initialSettings: Settings = {
+  narratorEnabled: true,
+  darkMode: false,
+  ageStageOverride: null,
 };
 
 // ─── STORE ────────────────────────────────────────────────────────────────────
@@ -117,30 +135,26 @@ export const useDharmaStore = create<DharmaStore>()(
       progress: initialProgress,
       progressHydrated: false,
 
-      /**
-       * Called once on app mount (from AppShell) to update the streak and
-       * mark today as visited. Uses the persisted lastVisit date to decide
-       * whether to increment, reset, or leave the streak unchanged.
-       */
       _hydrateProgress: () => {
         const today = todayStr();
-        const yesterday = yesterdayStr();
         const p = get().progress;
 
         if (p.lastVisit === today) {
-          // Already visited today — just mark hydrated
           set({ progressHydrated: true, profileHydrated: true });
           return;
         }
 
         const newStreak =
-          p.lastVisit === yesterday ? p.streak + 1 : 1;
+          p.lastVisit === yesterdayStr() ? p.streak + 1 : 1;
 
         set({
           progress: { ...p, streak: newStreak, lastVisit: today },
           progressHydrated: true,
           profileHydrated: true,
         });
+
+        // Re-apply dark mode on hydration (class is lost on page reload)
+        applyDarkMode(get().settings.darkMode);
       },
 
       completeStory: (slug, badge) =>
@@ -178,8 +192,7 @@ export const useDharmaStore = create<DharmaStore>()(
       },
 
       isMissionCompletedToday: (id) => {
-        const key = `${id}:${todayStr()}`;
-        return get().progress.completedMissions.includes(key);
+        return get().progress.completedMissions.includes(`${id}:${todayStr()}`);
       },
 
       saveReflection: (slug, text) => {
@@ -195,73 +208,82 @@ export const useDharmaStore = create<DharmaStore>()(
           }
 
           reflections[slug] = { text: trimmed, date: todayStr() };
-          // Award 1 petal the first time a reflection is written for a story
           const petals = had ? p.petals : p.petals + 1;
           return { progress: { ...p, reflections, petals } };
         });
+      },
+
+      // ── Settings ─────────────────────────────────────────────────────────────
+      settings: initialSettings,
+
+      setNarratorEnabled: (v) =>
+        set((s) => ({ settings: { ...s.settings, narratorEnabled: v } })),
+
+      toggleDarkMode: () => {
+        const next = !get().settings.darkMode;
+        applyDarkMode(next);
+        set((s) => ({ settings: { ...s.settings, darkMode: next } }));
+      },
+
+      setDarkMode: (v) => {
+        applyDarkMode(v);
+        set((s) => ({ settings: { ...s.settings, darkMode: v } }));
+      },
+
+      setAgeStageOverride: (v) =>
+        set((s) => ({ settings: { ...s.settings, ageStageOverride: v } })),
+
+      resolvedAgeStage: () => {
+        const { settings, profile } = get();
+        return settings.ageStageOverride ?? profile?.ageStage ?? "Curious";
       },
     }),
     {
       name: "dharma-store-v1",
       storage: createJSONStorage(() => localStorage),
-      /**
-       * Only persist the data that needs to survive page reloads.
-       * profileHydrated and progressHydrated are runtime flags — always false on load.
-       */
       partialize: (state) => ({
         profile: state.profile,
         progress: state.progress,
+        settings: state.settings,
       }),
-      /**
-       * Migration from the old dual-key storage format (dharma-profile-v1 +
-       * dharma-progress-v1). On first load of the new store, if the old keys
-       * exist we merge them in and the user loses nothing.
-       */
       onRehydrateStorage: () => (state) => {
         if (!state || typeof window === "undefined") return;
 
-        // Attempt migration from old storage keys
+        // Migrate from old dual-key storage
         const oldProfile = localStorage.getItem("dharma-profile-v1");
         const oldProgress = localStorage.getItem("dharma-progress-v1");
 
         if (oldProfile && !state.profile) {
           try {
-            state.profile = JSON.parse(oldProfile);
-          } catch {
-            // ignore corrupt data
-          }
+            const op = JSON.parse(oldProfile);
+            state.profile = { ageStage: "Curious", ...op };
+          } catch { /* ignore */ }
         }
 
         if (oldProgress) {
           try {
             const op = JSON.parse(oldProgress);
-            const hasOldData =
-              op.petals > 0 ||
-              (op.completedStories?.length ?? 0) > 0;
+            const hasOldData = op.petals > 0 || (op.completedStories?.length ?? 0) > 0;
             if (hasOldData) {
               state.progress = {
                 ...initialProgress,
                 ...op,
-                // earnedBadges didn't exist in old format — start fresh
                 earnedBadges: state.progress.earnedBadges ?? [],
               };
             }
-          } catch {
-            // ignore corrupt data
-          }
+          } catch { /* ignore */ }
         }
+
+        // Re-apply dark mode class after rehydration
+        if (state.settings?.darkMode) applyDarkMode(true);
       },
     },
   ),
 );
 
-// ─── COMPATIBILITY SELECTORS ──────────────────────────────────────────────────
-// These thin selectors allow existing route files to keep using the old hook
-// signatures during the transition. They read from the Zustand store instead
-// of from their own useState instances.
-
+// ─── SELECTORS ────────────────────────────────────────────────────────────────
 export const selectProfile = (s: DharmaStore) => s.profile;
 export const selectProgress = (s: DharmaStore) => s.progress;
 export const selectHydrated = (s: DharmaStore) => s.progressHydrated;
-export const selectEarnedBadges = (s: DharmaStore) =>
-  s.progress.earnedBadges;
+export const selectEarnedBadges = (s: DharmaStore) => s.progress.earnedBadges;
+export const selectSettings = (s: DharmaStore) => s.settings;

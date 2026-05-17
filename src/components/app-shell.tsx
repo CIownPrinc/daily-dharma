@@ -21,6 +21,7 @@ const items = [
   { to: "/library", label: "Stories", icon: "✦" },
   { to: "/journey", label: "Journey", icon: "✿" },
   { to: "/sanctuary", label: "Sanctuary", icon: "❀" },
+  { to: "/settings", label: "Settings", icon: "⚙" },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {

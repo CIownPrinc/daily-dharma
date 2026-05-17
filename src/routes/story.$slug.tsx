@@ -20,7 +20,9 @@ import { Confetti } from "@/components/confetti";
 import { BadgeRing } from "@/components/badge-ring";
 import { ChantCard } from "@/components/chant-card";
 import { useProgress } from "@/lib/use-progress";
+import { useProfile } from "@/lib/use-profile";
 import { useNarrator } from "@/lib/use-narrator";
+import { useDharmaStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/story/$slug")({
@@ -66,11 +68,27 @@ function StoryPage() {
   const [finished, setFinished] = useState(false);
   const [choiceIdx, setChoiceIdx] = useState<number | null>(null);
   const { completeStory } = useProgress();
+  const { profile } = useProfile();
+  const narratorEnabled = useDharmaStore((s) => s.settings.narratorEnabled);
   const narrator = useNarrator();
 
+  // Stop narration when page changes or component unmounts
   useEffect(() => {
     return () => narrator.stop();
   }, [pageIdx, narrator]);
+
+  // Auto-read when narratorEnabled is on and a new page loads
+  useEffect(() => {
+    if (!narratorEnabled || !narrator.supported) return;
+    const page = story.pages[pageIdx];
+    if (!page) return;
+    const text = [page.text, page.wisdom].filter(Boolean).join(". ");
+    // Small delay so the page transition animation completes first
+    const t = setTimeout(() => narrator.speak(text), 350);
+    return () => clearTimeout(t);
+  }, [pageIdx, narratorEnabled, narrator, story.pages]);
+
+  const firstName = profile?.name?.split(" ")[0] ?? null;
 
   const page = story.pages[pageIdx]!;
   const isLast = pageIdx === story.pages.length - 1;
@@ -136,7 +154,9 @@ function StoryPage() {
               />
             ))}
           </div>
-          {/* Narrator button */}
+          {/* Narrator button — only shown when narrator is supported.
+              When narratorEnabled is true in settings, narration auto-plays
+              and this button acts as a manual pause/restart control. */}
           {narrator.supported && (
             <button
               type="button"
@@ -192,7 +212,34 @@ function StoryPage() {
               {page.text}
             </p>
 
-            {/* Wisdom quote */}
+            {/* Character speech bubble — page 1 only (second page of the story).
+                The guide character addresses the child by name to create a direct,
+                personal connection. This is the key identity-formation mechanic:
+                the character speaks *to* this specific child, not to a generic reader. */}
+            {pageIdx === 1 && (
+              <div
+                className="mb-4 flex items-start gap-3 rounded-2xl p-4 ring-1 ring-ink/5 animate-scene"
+                style={{ background: `${story.sceneColor}0d` }}
+              >
+                <div
+                  className="size-11 rounded-xl flex items-center justify-center text-2xl shrink-0 ring-1 ring-ink/5"
+                  style={{ background: `${story.sceneColor}18` }}
+                  aria-hidden
+                >
+                  {story.character.emoji}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-lotus mb-1">
+                    {story.character.name} says
+                  </div>
+                  <p className="font-serif italic text-ink text-[15px] leading-relaxed">
+                    {firstName
+                      ? `${firstName}, listen carefully — every story holds a secret just for you.`
+                      : "Listen carefully — every story holds a secret just for you."}
+                  </p>
+                </div>
+              </div>
+            )}
             {page.wisdom && (
               <div className="mt-2 mb-4 flex gap-4 items-start bg-lotus-soft rounded-2xl p-5 ring-1 ring-lotus/15">
                 <div className="text-3xl shrink-0" aria-hidden>🪔</div>
