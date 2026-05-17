@@ -1,8 +1,24 @@
+/**
+ * Story route — immersive reading experience + reward flow.
+ *
+ * Key changes:
+ *   1. Full-bleed immersive layout: no AppShell padding on this route
+ *      (handled by AppShell's isStoryRoute check). The image fills edge-to-edge.
+ *   2. Story background color (sceneColor) bleeds behind the text card for
+ *      emotional continuity as the child scrolls.
+ *   3. FinishView now shows the story's BadgeRing and story-specific mantra
+ *      (via ChantCard mantra prop) instead of generic content.
+ *   4. completeStory is called with the badge so the store records it.
+ *   5. Back button is always accessible but doesn't show the main nav
+ *      (handled in AppShell) — the child is fully inside the story.
+ */
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { stories, missions, type Story, type Mission } from "@/lib/dharma-data";
 import { Confetti } from "@/components/confetti";
+import { BadgeRing } from "@/components/badge-ring";
+import { ChantCard } from "@/components/chant-card";
 import { useProgress } from "@/lib/use-progress";
 import { useNarrator } from "@/lib/use-narrator";
 import { cn } from "@/lib/utils";
@@ -29,9 +45,7 @@ export const Route = createFileRoute("/story/$slug")({
     <AppShell>
       <div className="text-center py-20">
         <h1 className="font-serif text-3xl text-ink">This tale is missing</h1>
-        <Link to="/library" className="text-lotus font-bold mt-4 inline-block">
-          ← Back to the library
-        </Link>
+        <Link to="/library" className="text-lotus font-bold mt-4 inline-block">← Back to the library</Link>
       </div>
     </AppShell>
   ),
@@ -54,7 +68,6 @@ function StoryPage() {
   const { completeStory } = useProgress();
   const narrator = useNarrator();
 
-  // Stop narration when changing page or unmounting
   useEffect(() => {
     return () => narrator.stop();
   }, [pageIdx, narrator]);
@@ -66,7 +79,14 @@ function StoryPage() {
   const next = () => {
     if (choiceLocked) return;
     if (isLast) {
-      completeStory(story.slug);
+      // Pass the badge to the store so it's recorded on first completion
+      completeStory(story.slug, {
+        slug: story.slug,
+        name: story.badge.name,
+        icon: story.badge.icon,
+        virtue: story.badge.virtue,
+        earnedAt: new Date().toISOString().slice(0, 10),
+      });
       setFinished(true);
     } else {
       setPageIdx((i) => i + 1);
@@ -79,15 +99,68 @@ function StoryPage() {
     setChoiceIdx(null);
   };
 
-  return (
-    <AppShell>
-      <Link to="/library" className="inline-flex items-center gap-1 text-sm text-ink-soft font-bold mb-6 hover:text-lotus">
-        ← The Library
-      </Link>
+  if (finished) {
+    return (
+      <AppShell>
+        <FinishView story={story} />
+      </AppShell>
+    );
+  }
 
-      {!finished ? (
-        <article className="bg-card rounded-[2rem] ring-1 ring-ink/5 shadow-petal overflow-hidden">
-          <div className="aspect-[16/10] md:aspect-[16/8] bg-lotus-soft overflow-hidden relative">
+  return (
+    // Full-bleed story layout — no AppShell padding (see app-shell.tsx)
+    <AppShell>
+      <div
+        className="min-h-dvh flex flex-col"
+        style={{ background: story.sceneColor }}
+      >
+        {/* Floating back + progress bar */}
+        <div className="absolute top-0 left-0 right-0 z-20 flex items-center gap-3 px-4 pt-4 md:pt-6 md:px-6">
+          <Link
+            to="/library"
+            className="size-10 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white font-bold text-lg shrink-0 hover:bg-black/40 transition-colors"
+            aria-label="Back to library"
+          >
+            ←
+          </Link>
+          {/* Page progress pills */}
+          <div className="flex items-center gap-1.5 flex-1">
+            {story.pages.map((_, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "h-1.5 rounded-full transition-all duration-300",
+                  i === pageIdx ? "bg-white w-8" : i < pageIdx ? "bg-white/50 w-4" : "bg-white/25 w-4",
+                )}
+                aria-hidden
+              />
+            ))}
+          </div>
+          {/* Narrator button */}
+          {narrator.supported && (
+            <button
+              type="button"
+              onClick={() => {
+                if (narrator.speaking) narrator.stop();
+                else narrator.speak([page.text, page.wisdom].filter(Boolean).join(". "));
+              }}
+              className={cn(
+                "inline-flex items-center gap-2 text-xs font-bold rounded-full px-3 py-1.5 ring-1 transition-colors",
+                narrator.speaking
+                  ? "bg-white text-ink ring-white"
+                  : "bg-black/30 backdrop-blur-sm text-white ring-white/20 hover:bg-black/40",
+              )}
+              aria-label={narrator.speaking ? "Stop narration" : "Listen to this page"}
+            >
+              <span aria-hidden>{narrator.speaking ? "⏸" : "🔊"}</span>
+              {narrator.speaking ? "Pause" : "Read"}
+            </button>
+          )}
+        </div>
+
+        {/* Story image — full bleed hero */}
+        <div className="relative flex-shrink-0">
+          <div className="aspect-[4/3] md:aspect-[16/9] w-full overflow-hidden">
             <img
               src={page.image ?? story.image}
               alt={story.title}
@@ -96,47 +169,32 @@ function StoryPage() {
               className="w-full h-full object-cover transition-opacity duration-500"
               key={pageIdx}
             />
-            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-card/95 to-transparent" />
           </div>
+          {/* Gradient bridge from image into text card */}
+          <div
+            className="absolute inset-x-0 bottom-0 h-20 pointer-events-none"
+            style={{ background: `linear-gradient(to top, ${story.sceneColor}, transparent)` }}
+            aria-hidden
+          />
+        </div>
 
-          <div className="p-6 md:p-10">
-            <div className="text-[11px] font-bold uppercase tracking-widest text-lotus mb-3">
+        {/* Text card — slides up from bottom */}
+        <div className="flex-1 flex flex-col rounded-t-3xl -mt-6 relative z-10 bg-card">
+          <div className="p-6 md:p-10 flex-1 flex flex-col">
+            <div className="text-[11px] font-bold uppercase tracking-widest text-lotus mb-2">
               {story.realm} · Page {pageIdx + 1} of {story.pages.length}
             </div>
             <h1 className="font-serif text-2xl md:text-3xl text-ink mb-5 text-balance">
               {story.title}
             </h1>
 
-            <p className="font-serif text-lg md:text-xl text-ink leading-relaxed text-pretty min-h-[6rem]">
+            <p className="font-serif text-lg md:text-xl text-ink leading-relaxed text-pretty min-h-[5rem] mb-4">
               {page.text}
             </p>
 
-            {narrator.supported && (
-              <div className="mt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (narrator.speaking) narrator.stop();
-                    else narrator.speak([page.text, page.wisdom].filter(Boolean).join(". "));
-                  }}
-                  className={cn(
-                    "inline-flex items-center gap-2 text-sm font-bold rounded-full px-4 py-2 ring-1 transition-colors",
-                    narrator.speaking
-                      ? "bg-lotus text-primary-foreground ring-lotus shadow-petal"
-                      : "bg-jasmine/70 text-ink ring-ink/10 hover:bg-lotus-soft hover:ring-lotus/30",
-                  )}
-                  aria-label={narrator.speaking ? "Stop narration" : "Listen to this page"}
-                >
-                  <span aria-hidden className={narrator.speaking ? "animate-gentle-pulse" : ""}>
-                    {narrator.speaking ? "⏸" : "🔊"}
-                  </span>
-                  {narrator.speaking ? "Pause story" : "Read to me"}
-                </button>
-              </div>
-            )}
-
+            {/* Wisdom quote */}
             {page.wisdom && (
-              <div className="mt-6 flex gap-4 items-start bg-lotus-soft rounded-2xl p-5 ring-1 ring-lotus/15">
+              <div className="mt-2 mb-4 flex gap-4 items-start bg-lotus-soft rounded-2xl p-5 ring-1 ring-lotus/15">
                 <div className="text-3xl shrink-0" aria-hidden>🪔</div>
                 <div>
                   <div className="text-[11px] font-bold uppercase tracking-widest text-lotus mb-1">
@@ -147,8 +205,9 @@ function StoryPage() {
               </div>
             )}
 
+            {/* Choice interaction */}
             {page.choice && (
-              <div className="mt-6 bg-jasmine/60 rounded-2xl p-5 ring-1 ring-ink/5">
+              <div className="mt-2 mb-4 bg-jasmine/60 rounded-2xl p-5 ring-1 ring-ink/5">
                 <div className="font-bold text-ink mb-3 flex items-start gap-2">
                   <span aria-hidden>🤔</span>
                   <span>{page.choice.question}</span>
@@ -165,11 +224,11 @@ function StoryPage() {
                         onClick={() => choiceIdx === null && setChoiceIdx(i)}
                         disabled={answered}
                         className={cn(
-                          "text-left px-4 py-3 rounded-xl font-medium text-ink ring-1 transition-colors",
+                          "text-left px-4 py-3 rounded-xl font-medium text-ink ring-1 transition-all",
                           !answered && "bg-card ring-ink/10 hover:ring-lotus/40 hover:bg-lotus-soft cursor-pointer",
-                          answered && isCorrect && "bg-leaf-soft ring-leaf/40 text-ink",
-                          answered && !isCorrect && isPicked && "bg-card ring-ink/10 opacity-60",
-                          answered && !isCorrect && !isPicked && "bg-card ring-ink/10 opacity-50",
+                          answered && isCorrect && "bg-leaf-soft ring-leaf/40",
+                          answered && !isCorrect && isPicked && "bg-card ring-ink/10 opacity-50",
+                          answered && !isCorrect && !isPicked && "bg-card ring-ink/10 opacity-40",
                         )}
                       >
                         {opt}
@@ -178,8 +237,12 @@ function StoryPage() {
                   })}
                 </div>
                 {choiceIdx !== null && (
-                  <div className="mt-4 text-sm text-ink leading-relaxed bg-leaf-soft/60 rounded-xl px-4 py-3">
-                    ✨ {choiceIdx === page.choice.correctIndex
+                  <div
+                    className="mt-4 text-sm text-ink leading-relaxed bg-leaf-soft/60 rounded-xl px-4 py-3"
+                    aria-live="polite"
+                  >
+                    ✨{" "}
+                    {choiceIdx === page.choice.correctIndex
                       ? page.choice.feedback
                       : `That's a kind thought too. ${page.choice.feedback}`}
                   </div>
@@ -187,23 +250,12 @@ function StoryPage() {
               </div>
             )}
 
-            <div className="flex items-center gap-2 mt-8 mb-6">
-              {story.pages.map((_p, i: number) => (
-                <span
-                  key={i}
-                  className={cn(
-                    "h-1.5 rounded-full transition-all",
-                    i === pageIdx ? "bg-lotus w-8" : i < pageIdx ? "bg-lotus/40 w-4" : "bg-ink/10 w-4",
-                  )}
-                />
-              ))}
-            </div>
-
-            <div className="flex items-center justify-between gap-3">
+            {/* Navigation */}
+            <div className="flex items-center justify-between gap-3 mt-auto pt-4">
               <button
                 onClick={back}
                 disabled={pageIdx === 0}
-                className="px-5 py-3 rounded-full font-bold text-sm text-ink-soft hover:text-ink disabled:opacity-30"
+                className="px-5 py-3 rounded-full font-bold text-sm text-ink-soft hover:text-ink disabled:opacity-30 transition-colors"
               >
                 ← Back
               </button>
@@ -219,10 +271,8 @@ function StoryPage() {
               </button>
             </div>
           </div>
-        </article>
-      ) : (
-        <FinishView story={story} />
-      )}
+        </div>
+      </div>
     </AppShell>
   );
 }
@@ -234,7 +284,6 @@ function FinishView({ story }: { story: Story }) {
   const [text, setText] = useState(existing);
   const [saved, setSaved] = useState(false);
 
-  // Pick a "post-story" mission deterministically from the story slug
   const missionIdx =
     Math.abs(story.slug.split("").reduce((a, c) => a + c.charCodeAt(0), 0)) % missions.length;
   const mission: Mission = missions[missionIdx]!;
@@ -246,51 +295,56 @@ function FinishView({ story }: { story: Story }) {
     window.setTimeout(() => setSaved(false), 1800);
   };
 
-  // Find next story for auto-progression
   const idx = stories.findIndex((s) => s.slug === story.slug);
   const nextStory = idx >= 0 ? stories[(idx + 1) % stories.length] : null;
 
-  return (
-    <article className="bg-card rounded-[2rem] ring-1 ring-ink/5 shadow-petal p-8 md:p-12 relative">
-      <Confetti />
-      <div className="text-center">
-        <div className="text-5xl mb-4 animate-petal inline-block" aria-hidden>✿</div>
-        <h2 className="font-serif text-3xl text-ink mb-3">A petal for you.</h2>
-        <p className="text-ink-soft font-medium max-w-prose mx-auto mb-6">
-          You've earned <span className="font-bold text-lotus">3 petals</span> for finishing this tale.
-        </p>
+  // Check if this badge was just earned (not previously in progress)
+  const isNewBadge = !progress.earnedBadges.slice(0, -1).some(
+    (b) => b.slug === story.slug
+  );
 
-        <div className="bg-lotus-soft rounded-2xl p-6 md:p-8 max-w-md mx-auto mb-8">
-          <div className="text-[11px] font-bold uppercase tracking-widest text-lotus mb-2">
-            Today's Lesson
-          </div>
+  return (
+    <div className="max-w-2xl mx-auto pb-10">
+      <Confetti />
+
+      {/* Badge ring — the emotional peak of the session */}
+      <div className="bg-card rounded-[2rem] ring-1 ring-ink/5 shadow-petal p-8 md:p-12 mb-6 text-center">
+        <BadgeRing badge={story.badge} sceneColor={story.sceneColor} />
+
+        <div className="mt-8 bg-lotus-soft rounded-2xl p-6 max-w-md mx-auto">
+          <div className="text-[11px] font-bold uppercase tracking-widest text-lotus mb-2">Today's Lesson</div>
           <p className="font-serif italic text-lg text-ink">{story.lesson}</p>
         </div>
+
+        {isNewBadge && (
+          <p className="text-ink-soft font-medium text-sm mt-4">
+            +3 petals earned · Badge added to your Sanctuary
+          </p>
+        )}
+      </div>
+
+      {/* Story-specific mantra — tied to this story */}
+      <div className="mb-6">
+        <ChantCard mantra={story.mantra} />
       </div>
 
       {/* Reflection journal */}
-      <section className="max-w-xl mx-auto mb-8">
+      <section className="bg-card rounded-3xl ring-1 ring-ink/5 shadow-soft p-6 md:p-8 mb-6">
         <div className="flex items-center justify-between mb-2">
-          <div className="text-[11px] font-bold uppercase tracking-widest text-lotus">
-            Your Reflection
-          </div>
+          <div className="text-[11px] font-bold uppercase tracking-widest text-lotus">Your Reflection</div>
           <span className="text-[10px] font-bold text-ink-soft">+1 petal first time</span>
         </div>
-        <h3 className="font-serif text-xl text-ink mb-3">
-          What did this story whisper to you?
-        </h3>
+        <h3 className="font-serif text-xl text-ink mb-3">What did this story whisper to you?</h3>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={4}
           placeholder="A few words from your heart…"
-          className="w-full rounded-2xl bg-jasmine/70 ring-1 ring-ink/10 focus:ring-lotus/40 focus:outline-none p-4 font-serif text-ink placeholder:text-ink-soft/60 transition-shadow"
+          className="w-full rounded-2xl bg-jasmine/70 ring-1 ring-ink/10 focus:ring-lotus/40 focus:outline-none p-4 font-serif text-ink placeholder:text-ink-soft/60 transition-shadow resize-none"
         />
         <div className="flex items-center justify-end gap-3 mt-2">
           {saved && (
-            <span className="text-xs font-bold text-leaf-deep" aria-live="polite">
-              ✓ Saved
-            </span>
+            <span className="text-xs font-bold text-leaf-deep" aria-live="polite">✓ Saved</span>
           )}
           <button
             onClick={onSave}
@@ -303,14 +357,10 @@ function FinishView({ story }: { story: Story }) {
       </section>
 
       {/* Post-story mission */}
-      <section className="max-w-xl mx-auto mb-8 bg-leaf-soft rounded-3xl p-6 ring-1 ring-leaf/15">
-        <div className="text-[11px] font-bold uppercase tracking-widest text-leaf-deep mb-2">
-          Now Take It Into the World
-        </div>
+      <section className="bg-leaf-soft rounded-3xl p-6 ring-1 ring-leaf/15 mb-6">
+        <div className="text-[11px] font-bold uppercase tracking-widest text-leaf-deep mb-2">Now Take It Into the World</div>
         <h3 className="font-serif text-xl text-ink mb-1">{mission.title}</h3>
-        <p className="text-ink-soft font-medium leading-relaxed text-[15px] mb-4">
-          {mission.description}
-        </p>
+        <p className="text-ink-soft font-medium leading-relaxed text-[15px] mb-4">{mission.description}</p>
         <button
           onClick={() => !missionDone && completeMission(mission.id)}
           disabled={missionDone}
@@ -334,11 +384,9 @@ function FinishView({ story }: { story: Story }) {
         </button>
       </section>
 
+      {/* Navigation CTAs */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-        <Link
-          to="/"
-          className="px-7 py-3.5 rounded-full font-bold text-base text-ink-soft hover:text-ink"
-        >
+        <Link to="/" className="px-7 py-3.5 rounded-full font-bold text-base text-ink-soft hover:text-ink">
           Return to Today
         </Link>
         {nextStory && (
@@ -351,6 +399,6 @@ function FinishView({ story }: { story: Story }) {
           </Link>
         )}
       </div>
-    </article>
+    </div>
   );
 }

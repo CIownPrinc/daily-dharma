@@ -159,3 +159,127 @@
   }
   .animate-gentle-pulse { animation: gentle-pulse 2.5s ease-in-out infinite; }
 }
+
+/* ─── HOME HERO — immersive sunrise background ───────────────────────────────
+ * Pure CSS — no JS canvas, no layout shift, no performance cost.
+ * Inspired by Dharma Quest's emotional visual identity, implemented with
+ * CSS gradients + clip-path so it works in all modern browsers.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+.home-hero-sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    170deg,
+    oklch(0.35 0.12 30) 0%,    /* deep pre-dawn */
+    oklch(0.52 0.18 45) 25%,   /* sunrise saffron */
+    oklch(0.68 0.16 60) 50%,   /* golden hour */
+    oklch(0.45 0.12 270) 75%,  /* twilight indigo */
+    oklch(0.22 0.08 270) 100%  /* deep night */
+  );
+}
+
+/* Stars — layered radial gradients for a starfield effect */
+.home-hero-sky::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, white 1px, transparent 1px),
+    radial-gradient(circle, white 1px, transparent 1px),
+    radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255,255,255,0.4) 1px, transparent 1px);
+  background-size: 180px 180px, 120px 130px, 90px 110px, 200px 160px;
+  background-position: 15px 25px, 70px 90px, 130px 40px, 30px 130px;
+  animation: starfield 8s ease-in-out infinite alternate;
+  opacity: 0.55;
+}
+
+@keyframes starfield {
+  from { opacity: 0.3; }
+  to { opacity: 0.65; }
+}
+
+/* Sun glow */
+.home-hero-sun {
+  position: absolute;
+  top: 18px;
+  right: 32px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #fff9c4, #ffd54f 40%, #ff8f00);
+  box-shadow: 0 0 30px 10px oklch(0.75 0.18 70 / 0.5), 0 0 80px 30px oklch(0.68 0.16 60 / 0.2);
+  animation: sun-rise 1.2s ease-out forwards;
+}
+
+@keyframes sun-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Mountain silhouette — clip-path polygon */
+.home-hero-mountains {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55%;
+  background: linear-gradient(to top, oklch(0.22 0.08 270) 0%, transparent 100%);
+  clip-path: polygon(
+    0% 100%,
+    0% 70%,
+    5% 65%,
+    12% 45%,
+    18% 55%,
+    25% 25%,
+    32% 50%,
+    40% 30%,
+    50% 8%,
+    60% 35%,
+    68% 20%,
+    76% 42%,
+    84% 28%,
+    92% 48%,
+    100% 38%,
+    100% 100%
+  );
+}
+
+/* Min-height for the hero section */
+.home-hero-sky ~ * { position: relative; }
+.home-hero-sky,
+.home-hero-sun,
+.home-hero-mountains {
+  pointer-events: none;
+}
+
+/* ─── BADGE ANIMATIONS ────────────────────────────────────────────────────── */
+
+@keyframes badge-in {
+  0%   { opacity: 0; transform: scale(0.5) rotate(-180deg); }
+  60%  { opacity: 1; transform: scale(1.1) rotate(5deg); }
+  80%  { transform: scale(0.97) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.animate-badge-in { animation: badge-in 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin-slow { animation: spin-slow 8s linear infinite; }
+
+/* ─── STORY SCENE TRANSITION ─────────────────────────────────────────────── */
+@keyframes scene-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-scene { animation: scene-fade-in 0.4s ease-out forwards; }
+
+/* ─── NOTIFICATION PULSE ─────────────────────────────────────────────────── */
+@keyframes soft-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+.animate-soft-pulse { animation: soft-pulse 3s ease-in-out infinite; }

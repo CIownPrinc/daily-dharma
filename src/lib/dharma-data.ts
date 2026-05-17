@@ -40,18 +40,46 @@ export type Character = {
   blurb: string;
 };
 
+/**
+ * Badge: earned on story completion.
+ * "virtue" is the named quality this badge represents — used in badge blurbs
+ * and the badge shelf in Sanctuary. The icon is an emoji rendered in the
+ * BadgeRing component on the finish screen.
+ */
+export type Badge = {
+  name: string;
+  icon: string;
+  virtue: string;
+  /** A short line in the character's voice, shown on the badge card. */
+  characterQuote: string;
+};
+
+/**
+ * Mantra: story-specific chant shown on the finish screen.
+ * syllables is used by ChantCard to highlight each syllable as the child chants.
+ */
+export type Mantra = {
+  text: string;
+  meaning: string;
+  syllables: string[];
+};
+
 export type Story = {
   slug: string;
   title: string;
   realm: string;
   duration: string;
   image: string;
+  /** Dominant scene color — used as the story background behind the text card. */
+  sceneColor: string;
   blurb: string;
   lesson: string;
   pages: StoryPage[];
   level: 1 | 2 | 3;
   ageStage: AgeStage;
   character: Character;
+  badge: Badge;
+  mantra: Mantra;
 };
 
 export const stories: Story[] = [
@@ -61,17 +89,25 @@ export const stories: Story[] = [
     realm: "Vrindavan",
     duration: "3 min",
     image: krishna,
-    blurb:
-      "Discover how young Krishna protected his village from a mighty storm — a story about caring for those we love.",
+    sceneColor: "#1a237e",
+    blurb: "Discover how young Krishna protected his village from a mighty storm — a story about caring for those we love.",
     lesson: "True strength is used to protect, not to harm.",
     level: 1,
     ageStage: "Little",
     character: { name: "Krishna", emoji: "🪈", blurb: "The flute-player who lifted a mountain to keep his village safe." },
+    badge: {
+      name: "Protector's Heart",
+      icon: "🏔️",
+      virtue: "Protective Love",
+      characterQuote: "Krishna says: You too can be a shelter for someone today.",
+    },
+    mantra: {
+      text: "Hare Krishna Hare Krishna",
+      meaning: "I call to Krishna, the source of all joy and protection.",
+      syllables: ["Ha-re", "Krish-na", "Ha-re", "Krish-na"],
+    },
     pages: [
-      {
-        text: "Long ago in a green village called Vrindavan, a boy named Krishna sat under a flowering tree, playing his flute.",
-        image: krishna,
-      },
+      { text: "Long ago in a green village called Vrindavan, a boy named Krishna sat under a flowering tree, playing his flute.", image: krishna },
       {
         text: "One day, dark clouds gathered. Rain poured down so hard the cows could not find shelter and the children began to cry.",
         choice: {
@@ -81,16 +117,9 @@ export const stories: Story[] = [
           feedback: "Yes — Krishna felt love. Love is what makes us want to protect others.",
         },
       },
-      {
-        text: "Krishna smiled gently. He walked to the great Govardhan hill and lifted it up with one little finger — like an umbrella over his whole village.",
-      },
-      {
-        text: "For seven days he held the mountain high. The villagers stayed warm and dry, and the cows stood close to him.",
-      },
-      {
-        text: "When the storm passed, Krishna placed the hill back down. 'We are strong,' he said, 'when we keep each other safe.'",
-        wisdom: "True strength is used to protect, not to harm.",
-      },
+      { text: "Krishna smiled gently. He walked to the great Govardhan hill and lifted it up with one little finger — like an umbrella over his whole village." },
+      { text: "For seven days he held the mountain high. The villagers stayed warm and dry, and the cows stood close to him." },
+      { text: "When the storm passed, Krishna placed the hill back down. 'We are strong,' he said, 'when we keep each other safe.'", wisdom: "True strength is used to protect, not to harm." },
     ],
   },
   {
@@ -99,17 +128,25 @@ export const stories: Story[] = [
     realm: "The Wide Ocean",
     duration: "4 min",
     image: hanuman,
-    blurb:
-      "Hanuman stands at the edge of the world. Inside him, a quiet power waits to be remembered.",
+    sceneColor: "#1b5e20",
+    blurb: "Hanuman stands at the edge of the world. Inside him, a quiet power waits to be remembered.",
     lesson: "Believe in yourself — your strength is bigger than you know.",
     level: 1,
     ageStage: "Curious",
     character: { name: "Hanuman", emoji: "🐒", blurb: "The brave one made of wind and devotion." },
+    badge: {
+      name: "Loyal Guardian",
+      icon: "🐒",
+      virtue: "Devotion",
+      characterQuote: "Hanuman says: True strength comes from the love we carry inside.",
+    },
+    mantra: {
+      text: "Jai Hanuman Gyan Gun Sagar",
+      meaning: "Victory to Hanuman, ocean of wisdom and virtue.",
+      syllables: ["Jai", "Ha-nu-man", "Gyan", "Gun", "Sa-gar"],
+    },
     pages: [
-      {
-        text: "Hanuman stood at the very edge of the ocean. Far, far away was an island where his friend Sita waited to be found.",
-        image: hanuman,
-      },
+      { text: "Hanuman stood at the very edge of the ocean. Far, far away was an island where his friend Sita waited to be found.", image: hanuman },
       {
         text: "'I am only a small monkey,' he thought. 'How can I cross such a wide sea?'",
         choice: {
@@ -119,16 +156,9 @@ export const stories: Story[] = [
           feedback: "Yes! Sometimes courage means remembering the strength already inside us.",
         },
       },
-      {
-        text: "An old wise bear came near. 'Hanuman,' he whispered, 'you have forgotten who you are. You are made of wind and courage.'",
-      },
-      {
-        text: "Hanuman closed his eyes. He took a deep breath. He remembered. Then he leaped — high over the clouds!",
-      },
-      {
-        text: "He landed safely on the far shore. Sometimes the bravest thing is to remember how strong we already are.",
-        wisdom: "True devotion gives us the courage to do the impossible.",
-      },
+      { text: "An old wise bear came near. 'Hanuman,' he whispered, 'you have forgotten who you are. You are made of wind and courage.'" },
+      { text: "Hanuman closed his eyes. He took a deep breath. He remembered. Then he leaped — high over the clouds!" },
+      { text: "He landed safely on the far shore. Sometimes the bravest thing is to remember how strong we already are.", wisdom: "True devotion gives us the courage to do the impossible." },
     ],
   },
   {
@@ -137,12 +167,23 @@ export const stories: Story[] = [
     realm: "Quiet Hermitage",
     duration: "3 min",
     image: sage,
-    blurb:
-      "Why does the wisest master in the village spend every morning simply watching the water flow?",
+    sceneColor: "#37474f",
+    blurb: "Why does the wisest master in the village spend every morning simply watching the water flow?",
     lesson: "Stillness teaches us what hurry hides.",
     level: 2,
     ageStage: "Curious",
     character: { name: "The Old Sage", emoji: "🧘", blurb: "A quiet teacher who listens to the river." },
+    badge: {
+      name: "Still Waters",
+      icon: "🌊",
+      virtue: "Stillness",
+      characterQuote: "The Sage says: In your quiet moments, wisdom finds a way in.",
+    },
+    mantra: {
+      text: "Om Shanti Shanti Shanti",
+      meaning: "Peace — in my mind, in my heart, and in the world around me.",
+      syllables: ["Om", "Shan-ti", "Shan-ti", "Shan-ti"],
+    },
     pages: [
       { text: "In a quiet hermitage by a clear river lived an old sage with a long white beard.", image: sage },
       {
@@ -156,10 +197,7 @@ export const stories: Story[] = [
       },
       { text: "One day a small girl asked him. He smiled. 'Come sit with me. Watch the river for ten breaths.'" },
       { text: "She sat. She breathed. Slowly, her busy thoughts floated away like leaves on the water." },
-      {
-        text: "'Now you know,' said the sage. 'When the mind is still, the heart can listen.'",
-        wisdom: "When the mind is still, the heart can hear what hurry hides.",
-      },
+      { text: "'Now you know,' said the sage. 'When the mind is still, the heart can listen.'", wisdom: "When the mind is still, the heart can hear what hurry hides." },
     ],
   },
   {
@@ -168,12 +206,23 @@ export const stories: Story[] = [
     realm: "The Forest of Dandaka",
     duration: "3 min",
     image: rama,
-    blurb:
-      "Even princes must learn from the forest — about kindness, patience, and keeping a promise.",
+    sceneColor: "#bf360c",
+    blurb: "Even princes must learn from the forest — about kindness, patience, and keeping a promise.",
     lesson: "A promise kept is worth more than a crown.",
     level: 2,
     ageStage: "Little",
     character: { name: "Rama", emoji: "🏹", blurb: "A prince who keeps every promise, even small ones." },
+    badge: {
+      name: "Keeper of Words",
+      icon: "🏹",
+      virtue: "Integrity",
+      characterQuote: "Rama says: A small promise kept is worth more than a great one broken.",
+    },
+    mantra: {
+      text: "Om Sri Ramaya Namaha",
+      meaning: "I honor Lord Rama, the ideal of goodness and integrity.",
+      syllables: ["Om", "Sri", "Ra-ma-ya", "Na-ma-ha"],
+    },
     pages: [
       { text: "Prince Rama walked through a great forest. He had given up his kingdom to keep a promise to his father.", image: rama },
       { text: "A small deer stepped out from the trees. It was hungry and afraid." },
@@ -187,10 +236,7 @@ export const stories: Story[] = [
         },
       },
       { text: "'A true prince,' he thought, 'is gentle even when no one is watching.'" },
-      {
-        text: "Keeping our word — to others and to ourselves — makes the heart strong.",
-        wisdom: "A promise kept — even a small one — makes the heart strong.",
-      },
+      { text: "Keeping our word — to others and to ourselves — makes the heart strong.", wisdom: "A promise kept — even a small one — makes the heart strong." },
     ],
   },
   {
@@ -199,12 +245,23 @@ export const stories: Story[] = [
     realm: "Garden of Lotuses",
     duration: "3 min",
     image: ganesha,
-    blurb:
-      "How a tiny mouse became the best friend of a great elephant — a story about not judging by size.",
+    sceneColor: "#e65100",
+    blurb: "How a tiny mouse became the best friend of a great elephant — a story about not judging by size.",
     lesson: "Big or small, every friend matters.",
     level: 1,
     ageStage: "Little",
     character: { name: "Ganesha", emoji: "🐘", blurb: "The kind elephant who sees every friend, big or small." },
+    badge: {
+      name: "Open Heart",
+      icon: "🐘",
+      virtue: "Inclusion",
+      characterQuote: "Ganesha says: No one is too small to matter. No one is too big to need a friend.",
+    },
+    mantra: {
+      text: "Om Gam Ganapataye Namaha",
+      meaning: "I honor Ganesha, the remover of obstacles and friend to all.",
+      syllables: ["Om", "Gam", "Ga-na-pa-ta-ye", "Na-ma-ha"],
+    },
     pages: [
       { text: "In a garden of pink lotuses lived Ganesha — kind, wise, and shaped like a friendly elephant.", image: ganesha },
       {
@@ -218,10 +275,7 @@ export const stories: Story[] = [
       },
       { text: "Ganesha laughed warmly. 'Small things move mountains. You will be my dearest friend and my swiftest helper.'" },
       { text: "And so the mouse rode on Ganesha's shoulder, and together they helped everyone in the village." },
-      {
-        text: "We are never too small to be needed. We are never too big to need a friend.",
-        wisdom: "Big or small, every friend matters.",
-      },
+      { text: "We are never too small to be needed. We are never too big to need a friend.", wisdom: "Big or small, every friend matters." },
     ],
   },
   {
@@ -230,17 +284,25 @@ export const stories: Story[] = [
     realm: "Field of Kurukshetra",
     duration: "4 min",
     image: arjuna,
-    blurb:
-      "Two armies. One brave heart. And a quiet question whispered between them: what is the right thing to do?",
+    sceneColor: "#1a237e",
+    blurb: "Two armies. One brave heart. And a quiet question whispered between them: what is the right thing to do?",
     lesson: "Dharma means doing what is right, even when it is difficult.",
     level: 3,
     ageStage: "Seeker",
     character: { name: "Arjuna", emoji: "🎯", blurb: "A great archer who learned that feeling deeply is part of being brave." },
+    badge: {
+      name: "Courageous Heart",
+      icon: "🎯",
+      virtue: "Dharma",
+      characterQuote: "Arjuna says: Feeling afraid does not mean you are weak — it means you truly care.",
+    },
+    mantra: {
+      text: "Om Namo Bhagavate Vasudevaya",
+      meaning: "I bow to Lord Krishna, who lives in all hearts and guides us to do what is right.",
+      syllables: ["Om", "Na-mo", "Bha-ga-va-te", "Va-su-de-va-ya"],
+    },
     pages: [
-      {
-        text: "Two great armies stood facing each other on the wide field of Kurukshetra. The morning was very still.",
-        image: arjuna,
-      },
+      { text: "Two great armies stood facing each other on the wide field of Kurukshetra. The morning was very still.", image: arjuna },
       {
         text: "Arjuna, the greatest archer in the world, looked across and saw his teachers, his uncles, his cousins — people he loved.",
         choice: {
@@ -250,13 +312,8 @@ export const stories: Story[] = [
           feedback: "Yes — even great heroes feel sadness. Feeling deeply is part of being brave.",
         },
       },
-      {
-        text: "Arjuna lowered his bow. 'Krishna,' he whispered, 'I cannot fight. These are my own family.'",
-      },
-      {
-        text: "Krishna smiled gently. 'Arjuna, your dharma is to protect what is right. Do not run from what must be done — out of love or out of fear.'",
-        wisdom: "Dharma means doing what is right, even when it is difficult.",
-      },
+      { text: "Arjuna lowered his bow. 'Krishna,' he whispered, 'I cannot fight. These are my own family.'" },
+      { text: "Krishna smiled gently. 'Arjuna, your dharma is to protect what is right. Do not run from what must be done — out of love or out of fear.'", wisdom: "Dharma means doing what is right, even when it is difficult." },
     ],
   },
   {
@@ -265,17 +322,25 @@ export const stories: Story[] = [
     realm: "The Great Hall",
     duration: "3 min",
     image: draupadi,
-    blurb:
-      "When no one else dared to speak, one princess stood very still — and let the truth be heard.",
+    sceneColor: "#880e4f",
+    blurb: "When no one else dared to speak, one princess stood very still — and let the truth be heard.",
     lesson: "Courage is speaking the truth, even when your voice trembles.",
     level: 3,
     ageStage: "Seeker",
     character: { name: "Draupadi", emoji: "👑", blurb: "A princess whose quiet voice could shake a hall." },
+    badge: {
+      name: "Voice of Truth",
+      icon: "👑",
+      virtue: "Courage",
+      characterQuote: "Draupadi says: One brave voice, however quiet, can change what everyone thinks is possible.",
+    },
+    mantra: {
+      text: "Om Dum Durgayei Namaha",
+      meaning: "I honor Durga, the goddess of strength and courage.",
+      syllables: ["Om", "Dum", "Dur-ga-yei", "Na-ma-ha"],
+    },
     pages: [
-      {
-        text: "Draupadi was a princess known not for her crown, but for her wisdom and her clear, brave heart.",
-        image: draupadi,
-      },
+      { text: "Draupadi was a princess known not for her crown, but for her wisdom and her clear, brave heart.", image: draupadi },
       {
         text: "One day in the great hall, she was treated unfairly. Many wise men sat around her — but no one said a word.",
         choice: {
@@ -285,13 +350,8 @@ export const stories: Story[] = [
           feedback: "Yes! Speaking the truth, gently and bravely, is one of the greatest acts of dharma.",
         },
       },
-      {
-        text: "She looked at the gathered kings and asked, 'Is there not one person here with the courage to speak the truth?'",
-      },
-      {
-        text: "Her words shook the whole hall. Even the silent felt ashamed. One brave voice can change everything.",
-        wisdom: "Courage is speaking the truth — even when your voice trembles.",
-      },
+      { text: "She looked at the gathered kings and asked, 'Is there not one person here with the courage to speak the truth?'" },
+      { text: "Her words shook the whole hall. Even the silent felt ashamed. One brave voice can change everything.", wisdom: "Courage is speaking the truth — even when your voice trembles." },
     ],
   },
   {
@@ -300,17 +360,25 @@ export const stories: Story[] = [
     realm: "Forest Hermitage",
     duration: "3 min",
     image: eklavya,
-    blurb:
-      "A boy with no teacher, no school, no help — and yet he became one of the greatest archers of all.",
+    sceneColor: "#33691e",
+    blurb: "A boy with no teacher, no school, no help — and yet he became one of the greatest archers of all.",
     lesson: "Dedication is the greatest teacher.",
     level: 2,
     ageStage: "Curious",
     character: { name: "Eklavya", emoji: "🪶", blurb: "A boy who taught himself with patience and clay." },
+    badge: {
+      name: "Dedicated Spirit",
+      icon: "🪶",
+      virtue: "Discipline",
+      characterQuote: "Eklavya says: The student who practices when no one is watching becomes the teacher everyone admires.",
+    },
+    mantra: {
+      text: "Om Namo Narayanaya",
+      meaning: "I bow to the divine in all things — the teacher within and without.",
+      syllables: ["Om", "Na-mo", "Na-ra-ya-na-ya"],
+    },
     pages: [
-      {
-        text: "Eklavya was a boy from a forest village who dreamed of becoming a great archer. But no teacher would take him as a student.",
-        image: eklavya,
-      },
+      { text: "Eklavya was a boy from a forest village who dreamed of becoming a great archer. But no teacher would take him as a student.", image: eklavya },
       {
         text: "Instead of giving up, he made a small statue of the great teacher Dronacharya from clay.",
         choice: {
@@ -320,13 +388,8 @@ export const stories: Story[] = [
           feedback: "Yes! Practicing — even when no one is watching — is the greatest teacher.",
         },
       },
-      {
-        text: "Every morning and every evening, he practiced his archery in front of the statue. Year after year.",
-      },
-      {
-        text: "He became so skilled that he passed every student at the royal academy — without ever stepping inside.",
-        wisdom: "Dedication and quiet practice can take you farther than any classroom.",
-      },
+      { text: "Every morning and every evening, he practiced his archery in front of the statue. Year after year." },
+      { text: "He became so skilled that he passed every student at the royal academy — without ever stepping inside.", wisdom: "Dedication and quiet practice can take you farther than any classroom." },
     ],
   },
   {
@@ -335,17 +398,25 @@ export const stories: Story[] = [
     realm: "Twilight Forest",
     duration: "4 min",
     image: savitri,
-    blurb:
-      "When a great being came to take what she loved, Savitri did the bravest thing of all — she simply followed.",
+    sceneColor: "#4a148c",
+    blurb: "When a great being came to take what she loved, Savitri did the bravest thing of all — she simply followed.",
     lesson: "Love and wisdom together can soften any heart.",
     level: 3,
     ageStage: "Seeker",
     character: { name: "Savitri", emoji: "🌙", blurb: "A wise princess who walked beside the stars." },
+    badge: {
+      name: "Wisdom Seeker",
+      icon: "🌙",
+      virtue: "Wisdom",
+      characterQuote: "Savitri says: Ask the right question and the whole universe leans in to answer.",
+    },
+    mantra: {
+      text: "Om Aim Saraswatyei Namaha",
+      meaning: "I honor Saraswati, goddess of wisdom and light.",
+      syllables: ["Om", "Aim", "Sa-ras-wa-tyei", "Na-ma-ha"],
+    },
     pages: [
-      {
-        text: "Savitri was a princess so wise and so loving that even the stars were said to listen when she spoke.",
-        image: savitri,
-      },
+      { text: "Savitri was a princess so wise and so loving that even the stars were said to listen when she spoke.", image: savitri },
       {
         text: "One twilight, a great being came to take her beloved away. Savitri did not weep. She simply followed.",
         choice: {
@@ -355,13 +426,8 @@ export const stories: Story[] = [
           feedback: "Yes! Quiet wisdom and gentle questions can move even the strongest hearts.",
         },
       },
-      {
-        text: "She walked and walked, asking gentle questions, until the great being said, 'You impress me. Ask for any gift.'",
-      },
-      {
-        text: "Savitri smiled. With one clever wish, she asked for something only her beloved being alive could give. Her love and her cleverness brought him back.",
-        wisdom: "Love joined with wisdom can soften even the hardest heart.",
-      },
+      { text: "She walked and walked, asking gentle questions, until the great being said, 'You impress me. Ask for any gift.'" },
+      { text: "Savitri smiled. With one clever wish, she asked for something only her beloved being alive could give. Her love and her cleverness brought him back.", wisdom: "Love joined with wisdom can soften even the hardest heart." },
     ],
   },
   {
@@ -370,17 +436,25 @@ export const stories: Story[] = [
     realm: "The Old Kingdom",
     duration: "3 min",
     image: prahlad,
-    blurb:
-      "A small boy whose heart was so full of love that nothing could shake him.",
+    sceneColor: "#311b92",
+    blurb: "A small boy whose heart was so full of love that nothing could shake him.",
     lesson: "True faith is gentle, steady, and made of love.",
     level: 2,
     ageStage: "Curious",
     character: { name: "Prahlad", emoji: "🪷", blurb: "A small boy whose loving heart could not be shaken." },
+    badge: {
+      name: "Unshakeable Faith",
+      icon: "🪷",
+      virtue: "Faith",
+      characterQuote: "Prahlad says: Love is the quietest kind of courage — and the strongest.",
+    },
+    mantra: {
+      text: "Om Namo Narayanaya",
+      meaning: "I bow to Vishnu, the protector who is always near.",
+      syllables: ["Om", "Na-mo", "Na-ra-ya-na-ya"],
+    },
     pages: [
-      {
-        text: "Prahlad was a young boy whose father was a powerful king who did not believe in the divine.",
-        image: prahlad,
-      },
+      { text: "Prahlad was a young boy whose father was a powerful king who did not believe in the divine.", image: prahlad },
       {
         text: "But Prahlad loved the divine with his whole heart, and quietly prayed every day.",
         choice: {
@@ -390,13 +464,8 @@ export const stories: Story[] = [
           feedback: "Yes! Love is a quiet kind of strength — softer than steel, and stronger.",
         },
       },
-      {
-        text: "His father tried many things to stop him. But Prahlad simply smiled and said, 'The divine is in everything — even in you, Father.'",
-      },
-      {
-        text: "His quiet, loving faith protected him. The whole kingdom learned that gentleness can be the greatest power.",
-        wisdom: "True faith is gentle, steady, and made of love.",
-      },
+      { text: "His father tried many things to stop him. But Prahlad simply smiled and said, 'The divine is in everything — even in you, Father.'" },
+      { text: "His quiet, loving faith protected him. The whole kingdom learned that gentleness can be the greatest power.", wisdom: "True faith is gentle, steady, and made of love." },
     ],
   },
   {
@@ -405,17 +474,25 @@ export const stories: Story[] = [
     realm: "The Eternal Sky",
     duration: "4 min",
     image: dhruva,
-    blurb:
-      "A small boy walks alone into the forest with one quiet wish — and the whole sky listens.",
+    sceneColor: "#0d47a1",
+    blurb: "A small boy walks alone into the forest with one quiet wish — and the whole sky listens.",
     lesson: "A steady heart shines longer than the brightest star.",
     level: 2,
     ageStage: "Curious",
     character: { name: "Dhruva", emoji: "⭐", blurb: "A boy whose quiet devotion became a star that never moves." },
+    badge: {
+      name: "Steadfast Star",
+      icon: "⭐",
+      virtue: "Perseverance",
+      characterQuote: "Dhruva says: Stay still and steady long enough, and the whole sky will know your name.",
+    },
+    mantra: {
+      text: "Om Vishnave Namaha",
+      meaning: "I honor Vishnu, who holds all things steady.",
+      syllables: ["Om", "Vish-na-ve", "Na-ma-ha"],
+    },
     pages: [
-      {
-        text: "Dhruva was a small boy with a big sadness in his heart. He wished, more than anything, to be truly seen and loved.",
-        image: dhruva,
-      },
+      { text: "Dhruva was a small boy with a big sadness in his heart. He wished, more than anything, to be truly seen and loved.", image: dhruva },
       {
         text: "He walked alone into the forest. There, a wise sage taught him a single word to whisper, and a way of breathing slowly.",
         choice: {
@@ -425,16 +502,9 @@ export const stories: Story[] = [
           feedback: "Yes — quiet, steady practice can move even the stars.",
         },
       },
-      {
-        text: "Days became months. Dhruva sat so still that birds rested on his shoulders. He never stopped his quiet whisper.",
-      },
-      {
-        text: "The sky itself began to shine for him. A soft voice said, 'Dhruva, your steady heart has touched the heavens.'",
-      },
-      {
-        text: "Dhruva was placed in the night sky as the Pole Star — the one star that never moves, guiding every traveler home.",
-        wisdom: "A steady heart shines longer than the brightest star.",
-      },
+      { text: "Days became months. Dhruva sat so still that birds rested on his shoulders. He never stopped his quiet whisper." },
+      { text: "The sky itself began to shine for him. A soft voice said, 'Dhruva, your steady heart has touched the heavens.'" },
+      { text: "Dhruva was placed in the night sky as the Pole Star — the one star that never moves, guiding every traveler home.", wisdom: "A steady heart shines longer than the brightest star." },
     ],
   },
   {
@@ -443,17 +513,25 @@ export const stories: Story[] = [
     realm: "The Eternal Sky",
     duration: "4 min",
     image: nachiketa,
-    blurb:
-      "A curious boy walks straight up to the keeper of all endings — just to ask the question grown-ups are afraid to ask.",
+    sceneColor: "#004d40",
+    blurb: "A curious boy walks straight up to the keeper of all endings — just to ask the question grown-ups are afraid to ask.",
     lesson: "Asking real questions is the beginning of real wisdom.",
     level: 3,
     ageStage: "Seeker",
     character: { name: "Nachiketa", emoji: "❓", blurb: "A bright boy whose questions opened the doors of wisdom." },
+    badge: {
+      name: "Seeker of Truth",
+      icon: "❓",
+      virtue: "Curiosity",
+      characterQuote: "Nachiketa says: Never be afraid to ask the question no one else dares to ask.",
+    },
+    mantra: {
+      text: "Asato Ma Sad Gamaya",
+      meaning: "Lead me from the unreal to the real — from darkness to light.",
+      syllables: ["A-sa-to", "Ma", "Sad", "Ga-ma-ya"],
+    },
     pages: [
-      {
-        text: "Nachiketa was a bright boy who loved his father very much. One day, he asked a question his father didn't want to answer.",
-        image: nachiketa,
-      },
+      { text: "Nachiketa was a bright boy who loved his father very much. One day, he asked a question his father didn't want to answer.", image: nachiketa },
       {
         text: "Instead of being upset, Nachiketa walked all the way to the great hall of Yama, the gentle keeper of endings, and waited politely for three days.",
         choice: {
@@ -463,16 +541,9 @@ export const stories: Story[] = [
           feedback: "Yes! He cared more about understanding than about treasure.",
         },
       },
-      {
-        text: "Yama smiled. 'I will give you anything you wish — gold, kingdoms, long life. Just don't ask me your hard question.'",
-      },
-      {
-        text: "But Nachiketa shook his head gently. 'I don't want gold. I want to understand what is true.'",
-      },
-      {
-        text: "Yama was so moved that he taught the boy the deepest secrets — that what is real inside us never ends.",
-        wisdom: "Asking real questions, with a kind heart, opens the deepest doors.",
-      },
+      { text: "Yama smiled. 'I will give you anything you wish — gold, kingdoms, long life. Just don't ask me your hard question.'" },
+      { text: "But Nachiketa shook his head gently. 'I don't want gold. I want to understand what is true.'" },
+      { text: "Yama was so moved that he taught the boy the deepest secrets — that what is real inside us never ends.", wisdom: "Asking real questions, with a kind heart, opens the deepest doors." },
     ],
   },
   {
@@ -481,17 +552,25 @@ export const stories: Story[] = [
     realm: "The Eternal Sky",
     duration: "3 min",
     image: markandeya,
-    blurb:
-      "When even Time itself came knocking, one small boy held on to what he loved — and discovered something stronger than endings.",
+    sceneColor: "#37474f",
+    blurb: "When even Time itself came knocking, one small boy held on to what he loved — and discovered something stronger than endings.",
     lesson: "Love is the one thing that time cannot take.",
     level: 3,
     ageStage: "Seeker",
     character: { name: "Markandeya", emoji: "⏳", blurb: "A small boy whose love was older than time itself." },
+    badge: {
+      name: "Timeless Love",
+      icon: "⏳",
+      virtue: "Love",
+      characterQuote: "Markandeya says: Hold on to what you love. Time cannot reach it there.",
+    },
+    mantra: {
+      text: "Om Namah Shivaya",
+      meaning: "I bow to Shiva, the eternal — beyond time, beyond endings.",
+      syllables: ["Om", "Na-mah", "Shi-va-ya"],
+    },
     pages: [
-      {
-        text: "Markandeya was a kind little boy who loved sitting in the temple, hugging the smooth stone of Shiva, singing softly.",
-        image: markandeya,
-      },
+      { text: "Markandeya was a kind little boy who loved sitting in the temple, hugging the smooth stone of Shiva, singing softly.", image: markandeya },
       {
         text: "One day, the gentle figure of Time came to take him away. Markandeya didn't run. He held on tighter to the stone he loved.",
         choice: {
@@ -501,13 +580,8 @@ export const stories: Story[] = [
           feedback: "Yes — love is older and stronger than even time itself.",
         },
       },
-      {
-        text: "A great warmth filled the temple. Shiva himself appeared and said, 'A heart this loving cannot be carried away by time.'",
-      },
-      {
-        text: "Markandeya was blessed to stay forever young. The river of time still flows — but love stands gently outside of it.",
-        wisdom: "Love is the one thing that time cannot take.",
-      },
+      { text: "A great warmth filled the temple. Shiva himself appeared and said, 'A heart this loving cannot be carried away by time.'" },
+      { text: "Markandeya was blessed to stay forever young. The river of time still flows — but love stands gently outside of it.", wisdom: "Love is the one thing that time cannot take." },
     ],
   },
 ];
@@ -520,41 +594,14 @@ export type Mission = {
 };
 
 export const missions: Mission[] = [
-  {
-    id: "listen",
-    title: "The Gift of Listening",
-    description:
-      "Sit with someone older in your family for a few minutes. Ask them about their favorite memory from when they were your age.",
-    category: "Karma Yoga",
-  },
-  {
-    id: "still",
-    title: "Quiet Hands, Quiet Heart",
-    description:
-      "Find a comfy spot and sit perfectly still for one whole minute. Notice every sound you can hear.",
-    category: "Stillness",
-  },
-  {
-    id: "thanks",
-    title: "Three Thank-Yous",
-    description:
-      "Say thank you to three different people today. Mean it deeply each time.",
-    category: "Gratitude",
-  },
-  {
-    id: "help",
-    title: "Silent Helper",
-    description:
-      "Do one helpful thing for someone in your home today — without telling them you did it.",
-    category: "Kindness",
-  },
-  {
-    id: "breath",
-    title: "Five Lotus Breaths",
-    description:
-      "Imagine a lotus opening in your chest. Breathe in slowly through your nose, then out softly through your mouth — five times.",
-    category: "Pranayama",
-  },
+  { id: "listen", title: "The Gift of Listening", description: "Sit with someone older in your family for a few minutes. Ask them about their favorite memory from when they were your age.", category: "Karma Yoga" },
+  { id: "still", title: "Quiet Hands, Quiet Heart", description: "Find a comfy spot and sit perfectly still for one whole minute. Notice every sound you can hear.", category: "Stillness" },
+  { id: "thanks", title: "Three Thank-Yous", description: "Say thank you to three different people today. Mean it deeply each time.", category: "Gratitude" },
+  { id: "help", title: "Silent Helper", description: "Do one helpful thing for someone in your home today — without telling them you did it.", category: "Kindness" },
+  { id: "breath", title: "Five Lotus Breaths", description: "Imagine a lotus opening in your chest. Breathe in slowly through your nose, then out softly through your mouth — five times.", category: "Pranayama" },
+  { id: "kind-word", title: "One Kind Word", description: "Say something genuinely kind to someone today who might not be expecting it. Notice how it changes the air between you.", category: "Karma Yoga" },
+  { id: "nature", title: "Five Minutes Outside", description: "Step outside. Look at the sky, touch the earth, notice what is alive around you. Be still for five whole minutes.", category: "Stillness" },
+  { id: "share", title: "Share Something Small", description: "Share something you love — a snack, a song, a story — with someone around you today.", category: "Kindness" },
 ];
 
 export type Chant = {
@@ -566,27 +613,9 @@ export type Chant = {
 };
 
 export const chants: Chant[] = [
-  {
-    id: "om",
-    name: "Om",
-    meaning: "The first sound — a hum that calms everything inside.",
-    text: "Om… Om… Om…",
-    duration: "1:00",
-  },
-  {
-    id: "gayatri",
-    name: "Gayatri Mantra",
-    meaning: "A morning prayer for a clear, kind, and shining mind.",
-    text: "Om bhūr bhuvaḥ svaḥ\nTat savitur vareṇyaṃ\nBhargo devasya dhīmahi\nDhiyo yo naḥ pracodayāt",
-    duration: "2:15",
-  },
-  {
-    id: "shanti",
-    name: "Om Shanti",
-    meaning: "A wish for peace — for me, for you, for everyone.",
-    text: "Om Shanti, Shanti, Shanti",
-    duration: "1:30",
-  },
+  { id: "om", name: "Om", meaning: "The first sound — a hum that calms everything inside.", text: "Om… Om… Om…", duration: "1:00" },
+  { id: "gayatri", name: "Gayatri Mantra", meaning: "A morning prayer for a clear, kind, and shining mind.", text: "Om bhūr bhuvaḥ svaḥ\nTat savitur vareṇyaṃ\nBhargo devasya dhīmahi\nDhiyo yo naḥ pracodayāt", duration: "2:15" },
+  { id: "shanti", name: "Om Shanti", meaning: "A wish for peace — for me, for you, for everyone.", text: "Om Shanti, Shanti, Shanti", duration: "1:30" },
 ];
 
 export type JourneyNode = {
@@ -595,45 +624,10 @@ export type JourneyNode = {
 };
 
 export const journey: { realm: string; nodes: JourneyNode[] }[] = [
-  {
-    realm: "Vrindavan",
-    nodes: [
-      { storySlug: "boy-who-held-the-mountain", label: "The Mountain" },
-      { storySlug: "ganesha-and-the-mouse", label: "The Mouse" },
-    ],
-  },
-  {
-    realm: "The Forest of Epics",
-    nodes: [
-      { storySlug: "rama-and-the-deer", label: "The Deer" },
-      { storySlug: "leap-to-lanka", label: "The Leap" },
-    ],
-  },
-  {
-    realm: "Field of Kurukshetra",
-    nodes: [
-      { storySlug: "arjunas-choice", label: "The Choice" },
-      { storySlug: "draupadis-courage", label: "The Voice" },
-      { storySlug: "eklavyas-practice", label: "The Practice" },
-    ],
-  },
-  {
-    realm: "The Twilight Lands",
-    nodes: [
-      { storySlug: "savitri-and-the-stars", label: "The Quiet Walk" },
-      { storySlug: "prahlads-faith", label: "The Faith" },
-    ],
-  },
-  {
-    realm: "The Quiet Hermitage",
-    nodes: [{ storySlug: "sage-and-the-river", label: "The River" }],
-  },
-  {
-    realm: "The Eternal Sky",
-    nodes: [
-      { storySlug: "dhruva-and-the-pole-star", label: "The Pole Star" },
-      { storySlug: "nachiketas-questions", label: "The Question" },
-      { storySlug: "markandeya-and-time", label: "The River of Time" },
-    ],
-  },
+  { realm: "Vrindavan", nodes: [{ storySlug: "boy-who-held-the-mountain", label: "The Mountain" }, { storySlug: "ganesha-and-the-mouse", label: "The Mouse" }] },
+  { realm: "The Forest of Epics", nodes: [{ storySlug: "rama-and-the-deer", label: "The Deer" }, { storySlug: "leap-to-lanka", label: "The Leap" }] },
+  { realm: "Field of Kurukshetra", nodes: [{ storySlug: "arjunas-choice", label: "The Choice" }, { storySlug: "draupadis-courage", label: "The Voice" }, { storySlug: "eklavyas-practice", label: "The Practice" }] },
+  { realm: "The Twilight Lands", nodes: [{ storySlug: "savitri-and-the-stars", label: "The Quiet Walk" }, { storySlug: "prahlads-faith", label: "The Faith" }] },
+  { realm: "The Quiet Hermitage", nodes: [{ storySlug: "sage-and-the-river", label: "The River" }] },
+  { realm: "The Eternal Sky", nodes: [{ storySlug: "dhruva-and-the-pole-star", label: "The Pole Star" }, { storySlug: "nachiketas-questions", label: "The Question" }, { storySlug: "markandeya-and-time", label: "The River of Time" }] },
 ];

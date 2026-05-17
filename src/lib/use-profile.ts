@@ -1,6 +1,9 @@
-import { useEffect, useState, useCallback } from "react";
-
-const KEY = "dharma-profile-v1";
+/**
+ * Compatibility shim — delegates to the central Zustand store.
+ * See use-progress.ts for rationale.
+ */
+import { useCallback } from "react";
+import { useDharmaStore } from "@/lib/store";
 
 export const AVATARS = ["🦚", "🐘", "🪷", "🌟", "🐒", "🦁", "🌙", "🌸", "🪈", "🦋"] as const;
 export type Avatar = (typeof AVATARS)[number];
@@ -9,38 +12,28 @@ export type Profile = {
   name: string;
   avatar: Avatar;
   createdAt: string;
+  ageStage?: "Little" | "Curious" | "Seeker";
 };
 
-function load(): Profile | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as Profile) : null;
-  } catch {
-    return null;
-  }
-}
-
 export function useProfile() {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [hydrated, setHydrated] = useState(false);
+  const profile = useDharmaStore((s) => s.profile);
+  const hydrated = useDharmaStore((s) => s.profileHydrated);
+  const _saveProfile = useDharmaStore((s) => s.saveProfile);
+  const _clearProfile = useDharmaStore((s) => s.clearProfile);
 
-  useEffect(() => {
-    setProfile(load());
-    setHydrated(true);
-  }, []);
+  const save = useCallback(
+    (p: Profile) => {
+      _saveProfile({
+        name: p.name,
+        avatar: p.avatar as Avatar,
+        ageStage: p.ageStage ?? "Curious",
+        createdAt: p.createdAt,
+      });
+    },
+    [_saveProfile],
+  );
 
-  const save = useCallback((p: Profile) => {
-    setProfile(p);
-    if (typeof window !== "undefined") {
-      localStorage.setItem(KEY, JSON.stringify(p));
-    }
-  }, []);
-
-  const clear = useCallback(() => {
-    setProfile(null);
-    if (typeof window !== "undefined") localStorage.removeItem(KEY);
-  }, []);
+  const clear = useCallback(() => _clearProfile(), [_clearProfile]);
 
   return { profile, hydrated, save, clear };
 }
