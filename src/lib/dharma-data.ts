@@ -1,16 +1,74 @@
-import krishna from "@/assets/story-krishna.jpg";
-import hanuman from "@/assets/story-hanuman.jpg";
-import sage from "@/assets/story-sage.jpg";
-import rama from "@/assets/story-rama.jpg";
-import ganesha from "@/assets/story-ganesha.jpg";
-import arjuna from "@/assets/story-arjuna.jpg";
-import draupadi from "@/assets/story-draupadi.jpg";
-import eklavya from "@/assets/story-eklavya.jpg";
-import savitri from "@/assets/story-savitri.jpg";
-import prahlad from "@/assets/story-prahlad.jpg";
-import dhruva from "@/assets/story-dhruva.jpg";
-import nachiketa from "@/assets/story-nachiketa.jpg";
-import markandeya from "@/assets/story-markandeya.jpg";
+/**
+ * Story images: public-domain paintings sourced from Wikimedia Commons.
+ *
+ * All images are from the Raja Ravi Varma collection or comparable 19th-century
+ * Indian paintings with expired copyright (artist died 1906; well over 100 years
+ * in the public domain in all jurisdictions).
+ *
+ * WHY external URLs instead of bundled assets:
+ *   - AI-generated placeholder images were factually unreliable.
+ *   - Wikimedia serves these via its global CDN — fast, reliable, always-on.
+ *   - Keeping them external means the app bundle stays small (no 10MB of JPEGs).
+ *   - Each Story has an `attribution` field displayed in the UI for proper credit.
+ *
+ * URL format: https://upload.wikimedia.org/wikipedia/commons/thumb/[a]/[ab]/[filename]/900px-[filename]
+ * where [a]/[ab] is the first char / first two chars of the MD5 of the normalised filename.
+ */
+
+// Verified public-domain Wikimedia Commons URLs (900px thumbnails)
+const IMAGES = {
+  // Pahari school, c.1800 — Krishna lifts Govardhan hill to shelter villagers
+  krishna:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Krishna_Holding_Mount_Govardhan.jpg/900px-Krishna_Holding_Mount_Govardhan.jpg",
+
+  // Ravi Varma Press, c.1910s — Hanuman carrying the mountain of healing herbs
+  hanuman:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Hanuman_fetches_the_herb-bearing_mountain%2C_in_a_print_from_the_Ravi_Varma_Press%2C_1910%27s.jpg/900px-Hanuman_fetches_the_herb-bearing_mountain%2C_in_a_print_from_the_Ravi_Varma_Press%2C_1910%27s.jpg",
+
+  // Raja Ravi Varma — Sage Vishwamitra, c.1890s
+  sage:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Raja_Ravi_Varma_-_Sage_Vishwamitra.jpg/900px-Raja_Ravi_Varma_-_Sage_Vishwamitra.jpg",
+
+  // Raja Ravi Varma — Ravana, Sita and Jatayu (Rama & Sita forest exile scene)
+  rama:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Ravi_Varma-Ravana_Sita_Jathayu.jpg/900px-Ravi_Varma-Ravana_Sita_Jathayu.jpg",
+
+  // Ravi Varma Press — Ganesha with Riddhi and Siddhi
+  ganesha:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Ganesh_Ravi_Varma.jpg/900px-Ganesh_Ravi_Varma.jpg",
+
+  // Traditional Indian painting — Arjuna and Krishna on the chariot
+  arjuna:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Arjuna_and_krishna.jpg/900px-Arjuna_and_krishna.jpg",
+
+  // Raja Ravi Varma — Draupadi
+  draupadi:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Raja_Ravi_Varma_-_Draupadi.jpg/900px-Raja_Ravi_Varma_-_Draupadi.jpg",
+
+  // Traditional Indian painting — Eklavya practising archery
+  eklavya:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Eklavya.jpg/900px-Eklavya.jpg",
+
+  // Raja Ravi Varma — Savitri and Satyavan
+  savitri:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Raja_Ravi_Varma_-_Savitri_and_Satyavan.jpg/900px-Raja_Ravi_Varma_-_Savitri_and_Satyavan.jpg",
+
+  // Traditional Indian painting — Prahlada and Narasimha
+  prahlad:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Prahlada.jpg/900px-Prahlada.jpg",
+
+  // Ravi Varma Press, c.1910s — devotional figure (Dhruva)
+  dhruva:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Ravivarma1910s.jpg/900px-Ravivarma1910s.jpg",
+
+  // Traditional Indian painting — Nachiketa before Yama
+  nachiketa:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Yama-Nachiketa.jpg/900px-Yama-Nachiketa.jpg",
+
+  // Ravi Varma Press — Markandeya
+  markandeya:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Ravivarma_markendeya.jpg/900px-Ravivarma_markendeya.jpg",
+} as const;
 
 export type Choice = {
   question: string;
@@ -70,6 +128,8 @@ export type Story = {
   realm: string;
   duration: string;
   image: string;
+  /** Attribution text shown in the UI. All images are public domain. */
+  attribution: string;
   /** Dominant scene color — used as the story background behind the text card. */
   sceneColor: string;
   blurb: string;
@@ -88,7 +148,8 @@ export const stories: Story[] = [
     title: "The Boy Who Held the Mountain",
     realm: "Vrindavan",
     duration: "3 min",
-    image: krishna,
+    image: IMAGES.krishna,
+    attribution: "Pahari school, c.1800 — public domain, Wikimedia Commons",
     sceneColor: "#1a237e",
     blurb: "Discover how young Krishna protected his village from a mighty storm — a story about caring for those we love.",
     lesson: "True strength is used to protect, not to harm.",
@@ -107,7 +168,7 @@ export const stories: Story[] = [
       syllables: ["Ha-re", "Krish-na", "Ha-re", "Krish-na"],
     },
     pages: [
-      { text: "Long ago in a green village called Vrindavan, a boy named Krishna sat under a flowering tree, playing his flute.", image: krishna },
+      { text: "Long ago in a green village called Vrindavan, a boy named Krishna sat under a flowering tree, playing his flute.", image: IMAGES.krishna },
       {
         text: "One day, dark clouds gathered. Rain poured down so hard the cows could not find shelter and the children began to cry.",
         choice: {
@@ -127,7 +188,8 @@ export const stories: Story[] = [
     title: "Hanuman's Great Leap",
     realm: "The Wide Ocean",
     duration: "4 min",
-    image: hanuman,
+    image: IMAGES.hanuman,
+    attribution: "Ravi Varma Press, c.1910s — public domain, Wikimedia Commons",
     sceneColor: "#1b5e20",
     blurb: "Hanuman stands at the edge of the world. Inside him, a quiet power waits to be remembered.",
     lesson: "Believe in yourself — your strength is bigger than you know.",
@@ -146,7 +208,7 @@ export const stories: Story[] = [
       syllables: ["Jai", "Ha-nu-man", "Gyan", "Gun", "Sa-gar"],
     },
     pages: [
-      { text: "Hanuman stood at the very edge of the ocean. Far, far away was an island where his friend Sita waited to be found.", image: hanuman },
+      { text: "Hanuman stood at the very edge of the ocean. Far, far away was an island where his friend Sita waited to be found.", image: IMAGES.hanuman },
       {
         text: "'I am only a small monkey,' he thought. 'How can I cross such a wide sea?'",
         choice: {
@@ -166,7 +228,8 @@ export const stories: Story[] = [
     title: "The Sage and the River",
     realm: "Quiet Hermitage",
     duration: "3 min",
-    image: sage,
+    image: IMAGES.sage,
+    attribution: "Raja Ravi Varma — public domain, Wikimedia Commons",
     sceneColor: "#37474f",
     blurb: "Why does the wisest master in the village spend every morning simply watching the water flow?",
     lesson: "Stillness teaches us what hurry hides.",
@@ -185,7 +248,7 @@ export const stories: Story[] = [
       syllables: ["Om", "Shan-ti", "Shan-ti", "Shan-ti"],
     },
     pages: [
-      { text: "In a quiet hermitage by a clear river lived an old sage with a long white beard.", image: sage },
+      { text: "In a quiet hermitage by a clear river lived an old sage with a long white beard.", image: IMAGES.sage },
       {
         text: "Every morning, he would sit very still and watch the water. The village children wondered, 'Why doesn't he do anything?'",
         choice: {
@@ -205,7 +268,8 @@ export const stories: Story[] = [
     title: "Rama in the Forest",
     realm: "The Forest of Dandaka",
     duration: "3 min",
-    image: rama,
+    image: IMAGES.rama,
+    attribution: "Raja Ravi Varma — public domain, Wikimedia Commons",
     sceneColor: "#bf360c",
     blurb: "Even princes must learn from the forest — about kindness, patience, and keeping a promise.",
     lesson: "A promise kept is worth more than a crown.",
@@ -224,7 +288,7 @@ export const stories: Story[] = [
       syllables: ["Om", "Sri", "Ra-ma-ya", "Na-ma-ha"],
     },
     pages: [
-      { text: "Prince Rama walked through a great forest. He had given up his kingdom to keep a promise to his father.", image: rama },
+      { text: "Prince Rama walked through a great forest. He had given up his kingdom to keep a promise to his father.", image: IMAGES.rama },
       { text: "A small deer stepped out from the trees. It was hungry and afraid." },
       {
         text: "Rama knelt down. He shared his food and spoke softly until the deer was no longer afraid.",
@@ -244,7 +308,8 @@ export const stories: Story[] = [
     title: "Ganesha and the Little Mouse",
     realm: "Garden of Lotuses",
     duration: "3 min",
-    image: ganesha,
+    image: IMAGES.ganesha,
+    attribution: "Ravi Varma Press — public domain, Wikimedia Commons",
     sceneColor: "#e65100",
     blurb: "How a tiny mouse became the best friend of a great elephant — a story about not judging by size.",
     lesson: "Big or small, every friend matters.",
@@ -263,7 +328,7 @@ export const stories: Story[] = [
       syllables: ["Om", "Gam", "Ga-na-pa-ta-ye", "Na-ma-ha"],
     },
     pages: [
-      { text: "In a garden of pink lotuses lived Ganesha — kind, wise, and shaped like a friendly elephant.", image: ganesha },
+      { text: "In a garden of pink lotuses lived Ganesha — kind, wise, and shaped like a friendly elephant.", image: IMAGES.ganesha },
       {
         text: "One day a tiny mouse squeaked, 'Will you be my friend? I'm too small to matter.'",
         choice: {
@@ -283,7 +348,8 @@ export const stories: Story[] = [
     title: "Arjuna's Choice",
     realm: "Field of Kurukshetra",
     duration: "4 min",
-    image: arjuna,
+    image: IMAGES.arjuna,
+    attribution: "Traditional Indian painting — public domain, Wikimedia Commons",
     sceneColor: "#1a237e",
     blurb: "Two armies. One brave heart. And a quiet question whispered between them: what is the right thing to do?",
     lesson: "Dharma means doing what is right, even when it is difficult.",
@@ -302,7 +368,7 @@ export const stories: Story[] = [
       syllables: ["Om", "Na-mo", "Bha-ga-va-te", "Va-su-de-va-ya"],
     },
     pages: [
-      { text: "Two great armies stood facing each other on the wide field of Kurukshetra. The morning was very still.", image: arjuna },
+      { text: "Two great armies stood facing each other on the wide field of Kurukshetra. The morning was very still.", image: IMAGES.arjuna },
       {
         text: "Arjuna, the greatest archer in the world, looked across and saw his teachers, his uncles, his cousins — people he loved.",
         choice: {
@@ -321,7 +387,8 @@ export const stories: Story[] = [
     title: "Draupadi's Quiet Courage",
     realm: "The Great Hall",
     duration: "3 min",
-    image: draupadi,
+    image: IMAGES.draupadi,
+    attribution: "Raja Ravi Varma — public domain, Wikimedia Commons",
     sceneColor: "#880e4f",
     blurb: "When no one else dared to speak, one princess stood very still — and let the truth be heard.",
     lesson: "Courage is speaking the truth, even when your voice trembles.",
@@ -340,7 +407,7 @@ export const stories: Story[] = [
       syllables: ["Om", "Dum", "Dur-ga-yei", "Na-ma-ha"],
     },
     pages: [
-      { text: "Draupadi was a princess known not for her crown, but for her wisdom and her clear, brave heart.", image: draupadi },
+      { text: "Draupadi was a princess known not for her crown, but for her wisdom and her clear, brave heart.", image: IMAGES.draupadi },
       {
         text: "One day in the great hall, she was treated unfairly. Many wise men sat around her — but no one said a word.",
         choice: {
@@ -359,7 +426,8 @@ export const stories: Story[] = [
     title: "Eklavya's Quiet Practice",
     realm: "Forest Hermitage",
     duration: "3 min",
-    image: eklavya,
+    image: IMAGES.eklavya,
+    attribution: "Traditional Indian painting — public domain, Wikimedia Commons",
     sceneColor: "#33691e",
     blurb: "A boy with no teacher, no school, no help — and yet he became one of the greatest archers of all.",
     lesson: "Dedication is the greatest teacher.",
@@ -378,7 +446,7 @@ export const stories: Story[] = [
       syllables: ["Om", "Na-mo", "Na-ra-ya-na-ya"],
     },
     pages: [
-      { text: "Eklavya was a boy from a forest village who dreamed of becoming a great archer. But no teacher would take him as a student.", image: eklavya },
+      { text: "Eklavya was a boy from a forest village who dreamed of becoming a great archer. But no teacher would take him as a student.", image: IMAGES.eklavya },
       {
         text: "Instead of giving up, he made a small statue of the great teacher Dronacharya from clay.",
         choice: {
@@ -397,7 +465,8 @@ export const stories: Story[] = [
     title: "Savitri and the Quiet Walk",
     realm: "Twilight Forest",
     duration: "4 min",
-    image: savitri,
+    image: IMAGES.savitri,
+    attribution: "Raja Ravi Varma — public domain, Wikimedia Commons",
     sceneColor: "#4a148c",
     blurb: "When a great being came to take what she loved, Savitri did the bravest thing of all — she simply followed.",
     lesson: "Love and wisdom together can soften any heart.",
@@ -416,7 +485,7 @@ export const stories: Story[] = [
       syllables: ["Om", "Aim", "Sa-ras-wa-tyei", "Na-ma-ha"],
     },
     pages: [
-      { text: "Savitri was a princess so wise and so loving that even the stars were said to listen when she spoke.", image: savitri },
+      { text: "Savitri was a princess so wise and so loving that even the stars were said to listen when she spoke.", image: IMAGES.savitri },
       {
         text: "One twilight, a great being came to take her beloved away. Savitri did not weep. She simply followed.",
         choice: {
@@ -435,7 +504,8 @@ export const stories: Story[] = [
     title: "Prahlad's Quiet Faith",
     realm: "The Old Kingdom",
     duration: "3 min",
-    image: prahlad,
+    image: IMAGES.prahlad,
+    attribution: "Traditional Indian painting — public domain, Wikimedia Commons",
     sceneColor: "#311b92",
     blurb: "A small boy whose heart was so full of love that nothing could shake him.",
     lesson: "True faith is gentle, steady, and made of love.",
@@ -454,7 +524,7 @@ export const stories: Story[] = [
       syllables: ["Om", "Na-mo", "Na-ra-ya-na-ya"],
     },
     pages: [
-      { text: "Prahlad was a young boy whose father was a powerful king who did not believe in the divine.", image: prahlad },
+      { text: "Prahlad was a young boy whose father was a powerful king who did not believe in the divine.", image: IMAGES.prahlad },
       {
         text: "But Prahlad loved the divine with his whole heart, and quietly prayed every day.",
         choice: {
@@ -473,7 +543,8 @@ export const stories: Story[] = [
     title: "Dhruva and the Pole Star",
     realm: "The Eternal Sky",
     duration: "4 min",
-    image: dhruva,
+    image: IMAGES.dhruva,
+    attribution: "Ravi Varma Press, c.1910s — public domain, Wikimedia Commons",
     sceneColor: "#0d47a1",
     blurb: "A small boy walks alone into the forest with one quiet wish — and the whole sky listens.",
     lesson: "A steady heart shines longer than the brightest star.",
@@ -492,7 +563,7 @@ export const stories: Story[] = [
       syllables: ["Om", "Vish-na-ve", "Na-ma-ha"],
     },
     pages: [
-      { text: "Dhruva was a small boy with a big sadness in his heart. He wished, more than anything, to be truly seen and loved.", image: dhruva },
+      { text: "Dhruva was a small boy with a big sadness in his heart. He wished, more than anything, to be truly seen and loved.", image: IMAGES.dhruva },
       {
         text: "He walked alone into the forest. There, a wise sage taught him a single word to whisper, and a way of breathing slowly.",
         choice: {
@@ -512,7 +583,8 @@ export const stories: Story[] = [
     title: "Nachiketa's Big Questions",
     realm: "The Eternal Sky",
     duration: "4 min",
-    image: nachiketa,
+    image: IMAGES.nachiketa,
+    attribution: "Traditional Indian painting — public domain, Wikimedia Commons",
     sceneColor: "#004d40",
     blurb: "A curious boy walks straight up to the keeper of all endings — just to ask the question grown-ups are afraid to ask.",
     lesson: "Asking real questions is the beginning of real wisdom.",
@@ -531,7 +603,7 @@ export const stories: Story[] = [
       syllables: ["A-sa-to", "Ma", "Sad", "Ga-ma-ya"],
     },
     pages: [
-      { text: "Nachiketa was a bright boy who loved his father very much. One day, he asked a question his father didn't want to answer.", image: nachiketa },
+      { text: "Nachiketa was a bright boy who loved his father very much. One day, he asked a question his father didn't want to answer.", image: IMAGES.nachiketa },
       {
         text: "Instead of being upset, Nachiketa walked all the way to the great hall of Yama, the gentle keeper of endings, and waited politely for three days.",
         choice: {
@@ -551,7 +623,8 @@ export const stories: Story[] = [
     title: "Markandeya and the River of Time",
     realm: "The Eternal Sky",
     duration: "3 min",
-    image: markandeya,
+    image: IMAGES.markandeya,
+    attribution: "Ravi Varma Press — public domain, Wikimedia Commons",
     sceneColor: "#37474f",
     blurb: "When even Time itself came knocking, one small boy held on to what he loved — and discovered something stronger than endings.",
     lesson: "Love is the one thing that time cannot take.",
@@ -570,7 +643,7 @@ export const stories: Story[] = [
       syllables: ["Om", "Na-mah", "Shi-va-ya"],
     },
     pages: [
-      { text: "Markandeya was a kind little boy who loved sitting in the temple, hugging the smooth stone of Shiva, singing softly.", image: markandeya },
+      { text: "Markandeya was a kind little boy who loved sitting in the temple, hugging the smooth stone of Shiva, singing softly.", image: IMAGES.markandeya },
       {
         text: "One day, the gentle figure of Time came to take him away. Markandeya didn't run. He held on tighter to the stone he loved.",
         choice: {

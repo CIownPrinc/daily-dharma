@@ -196,6 +196,14 @@ function StoryPage() {
             style={{ background: `linear-gradient(to top, ${story.sceneColor}, transparent)` }}
             aria-hidden
           />
+          {/* Attribution — small, unobtrusive, legally correct */}
+          {story.attribution && (
+            <div className="absolute bottom-0 right-0 px-2 pb-1 pointer-events-none">
+              <span className="text-[9px] text-white/40 font-medium leading-none">
+                {story.attribution}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Text card — slides up from bottom */}
