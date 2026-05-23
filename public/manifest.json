@@ -1,0 +1,27 @@
+{
+  "name": "Dharma Quest",
+  "short_name": "Dharma Quest",
+  "description": "Daily stories, habits, and wonder for children — inspired by the great Hindu epics.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdf6e3",
+  "theme_color": "#ff6f00",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "kids"],
+  "lang": "en",
+  "dir": "ltr"
+}

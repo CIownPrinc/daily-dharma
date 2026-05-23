@@ -82,6 +82,12 @@ export type StoryPage = {
   image?: string;
   choice?: Choice;
   wisdom?: string;
+  /**
+   * A line spoken in the character's voice on this specific page.
+   * Use {name} as a placeholder — replaced at render time with the child's
+   * first name. Only shown on pages after the first (page 0 lets the story open).
+   */
+  speakerLine?: string;
 };
 
 export type AgeStage = "Little" | "Curious" | "Seeker";
@@ -171,6 +177,7 @@ export const stories: Story[] = [
       { text: "Long ago in a green village called Vrindavan, a boy named Krishna sat under a flowering tree, playing his flute.", image: IMAGES.krishna },
       {
         text: "One day, dark clouds gathered. Rain poured down so hard the cows could not find shelter and the children began to cry.",
+        speakerLine: "Krishna says: {name}, did you know that love can make you strong enough to hold up a mountain?",
         choice: {
           question: "What do you think Krishna felt when he saw his village in trouble?",
           options: ["💛 He wanted to help", "😴 He didn't notice", "😠 He felt angry"],
@@ -178,9 +185,19 @@ export const stories: Story[] = [
           feedback: "Yes — Krishna felt love. Love is what makes us want to protect others.",
         },
       },
-      { text: "Krishna smiled gently. He walked to the great Govardhan hill and lifted it up with one little finger — like an umbrella over his whole village." },
-      { text: "For seven days he held the mountain high. The villagers stayed warm and dry, and the cows stood close to him." },
-      { text: "When the storm passed, Krishna placed the hill back down. 'We are strong,' he said, 'when we keep each other safe.'", wisdom: "True strength is used to protect, not to harm." },
+      {
+        text: "Krishna smiled gently. He walked to the great Govardhan hill and lifted it up with one little finger — like an umbrella over his whole village.",
+        speakerLine: "Krishna says: When was the last time you protected someone you love?",
+      },
+      {
+        text: "For seven days he held the mountain high. The villagers stayed warm and dry, and the cows stood close to him.",
+        speakerLine: "Krishna says: Can you think of someone you protect or care for today, {name}?",
+      },
+      {
+        text: "When the storm passed, Krishna placed the hill back down. 'We are strong,' he said, 'when we keep each other safe.'",
+        wisdom: "True strength is used to protect, not to harm.",
+        speakerLine: "Krishna says: {name}, that strength lives inside you too.",
+      },
     ],
   },
   {
@@ -211,6 +228,7 @@ export const stories: Story[] = [
       { text: "Hanuman stood at the very edge of the ocean. Far, far away was an island where his friend Sita waited to be found.", image: IMAGES.hanuman },
       {
         text: "'I am only a small monkey,' he thought. 'How can I cross such a wide sea?'",
+        speakerLine: "Hanuman says: {name}, have you ever forgotten how brave you really are?",
         choice: {
           question: "What gave Hanuman the courage to leap?",
           options: ["🙏 Remembering who he truly was", "💪 His muscles alone", "🍌 A tasty snack"],
@@ -218,9 +236,19 @@ export const stories: Story[] = [
           feedback: "Yes! Sometimes courage means remembering the strength already inside us.",
         },
       },
-      { text: "An old wise bear came near. 'Hanuman,' he whispered, 'you have forgotten who you are. You are made of wind and courage.'" },
-      { text: "Hanuman closed his eyes. He took a deep breath. He remembered. Then he leaped — high over the clouds!" },
-      { text: "He landed safely on the far shore. Sometimes the bravest thing is to remember how strong we already are.", wisdom: "True devotion gives us the courage to do the impossible." },
+      {
+        text: "An old wise bear came near. 'Hanuman,' he whispered, 'you have forgotten who you are. You are made of wind and courage.'",
+        speakerLine: "Hanuman says: The wise bear is right. We forget our own strength. Shall we remember together?",
+      },
+      {
+        text: "Hanuman closed his eyes. He took a deep breath. He remembered. Then he leaped — high over the clouds!",
+        speakerLine: "Hanuman says: Take a deep breath with me, {name}.",
+      },
+      {
+        text: "He landed safely on the far shore. Sometimes the bravest thing is to remember how strong we already are.",
+        wisdom: "True devotion gives us the courage to do the impossible.",
+        speakerLine: "Hanuman says: {name}, what is your ocean? What feels impossible — but maybe isn't?",
+      },
     ],
   },
   {
@@ -251,6 +279,7 @@ export const stories: Story[] = [
       { text: "In a quiet hermitage by a clear river lived an old sage with a long white beard.", image: IMAGES.sage },
       {
         text: "Every morning, he would sit very still and watch the water. The village children wondered, 'Why doesn't he do anything?'",
+        speakerLine: "The Sage says: {name}, what do you hear when everything is quiet?",
         choice: {
           question: "What was the sage really doing?",
           options: ["🧘 Listening with his whole heart", "😴 Falling asleep", "🐟 Counting fish"],
@@ -258,9 +287,19 @@ export const stories: Story[] = [
           feedback: "Yes! Stillness is its own kind of action — it lets us truly hear.",
         },
       },
-      { text: "One day a small girl asked him. He smiled. 'Come sit with me. Watch the river for ten breaths.'" },
-      { text: "She sat. She breathed. Slowly, her busy thoughts floated away like leaves on the water." },
-      { text: "'Now you know,' said the sage. 'When the mind is still, the heart can listen.'", wisdom: "When the mind is still, the heart can hear what hurry hides." },
+      {
+        text: "One day a small girl asked him. He smiled. 'Come sit with me. Watch the river for ten breaths.'",
+        speakerLine: "The Sage says: Come. Sit with me, {name}. Ten breaths. Just ten.",
+      },
+      {
+        text: "She sat. She breathed. Slowly, her busy thoughts floated away like leaves on the water.",
+        speakerLine: "The Sage says: {name}, you just did it. You listened. How did that feel?",
+      },
+      {
+        text: "'Now you know,' said the sage. 'When the mind is still, the heart can listen.'",
+        wisdom: "When the mind is still, the heart can hear what hurry hides.",
+        speakerLine: "The Sage says: The river never stops, and neither does your quiet heart.",
+      },
     ],
   },
   {
@@ -289,9 +328,13 @@ export const stories: Story[] = [
     },
     pages: [
       { text: "Prince Rama walked through a great forest. He had given up his kingdom to keep a promise to his father.", image: IMAGES.rama },
-      { text: "A small deer stepped out from the trees. It was hungry and afraid." },
+      {
+        text: "A small deer stepped out from the trees. It was hungry and afraid.",
+        speakerLine: "Rama says: {name}, I gave up my crown to keep a promise. What promises matter most to you?",
+      },
       {
         text: "Rama knelt down. He shared his food and spoke softly until the deer was no longer afraid.",
+        speakerLine: "Rama says: True kindness asks for nothing in return.",
         choice: {
           question: "Why did Rama help the little deer?",
           options: ["💛 Kindness, even with no one watching", "👀 To impress someone", "🏆 To win a prize"],
@@ -299,8 +342,15 @@ export const stories: Story[] = [
           feedback: "Yes — true kindness is who we are when no one is looking.",
         },
       },
-      { text: "'A true prince,' he thought, 'is gentle even when no one is watching.'" },
-      { text: "Keeping our word — to others and to ourselves — makes the heart strong.", wisdom: "A promise kept — even a small one — makes the heart strong." },
+      {
+        text: "'A true prince,' he thought, 'is gentle even when no one is watching.'",
+        speakerLine: "Rama says: {name}, can you think of one small promise to keep this week?",
+      },
+      {
+        text: "Keeping our word — to others and to ourselves — makes the heart strong.",
+        wisdom: "A promise kept — even a small one — makes the heart strong.",
+        speakerLine: "Rama says: A promise kept is worth more than any crown, {name}.",
+      },
     ],
   },
   {
@@ -331,6 +381,7 @@ export const stories: Story[] = [
       { text: "In a garden of pink lotuses lived Ganesha — kind, wise, and shaped like a friendly elephant.", image: IMAGES.ganesha },
       {
         text: "One day a tiny mouse squeaked, 'Will you be my friend? I'm too small to matter.'",
+        speakerLine: "Ganesha says: Hello, {name}! I see every friend — big or small. Do you?",
         choice: {
           question: "What did Ganesha think when he saw the tiny mouse?",
           options: ["✨ Every being is precious", "🙄 Too small to matter", "🤷 He didn't care"],
@@ -338,9 +389,19 @@ export const stories: Story[] = [
           feedback: "Yes — to a kind heart, no one is too small.",
         },
       },
-      { text: "Ganesha laughed warmly. 'Small things move mountains. You will be my dearest friend and my swiftest helper.'" },
-      { text: "And so the mouse rode on Ganesha's shoulder, and together they helped everyone in the village." },
-      { text: "We are never too small to be needed. We are never too big to need a friend.", wisdom: "Big or small, every friend matters." },
+      {
+        text: "Ganesha laughed warmly. 'Small things move mountains. You will be my dearest friend and my swiftest helper.'",
+        speakerLine: "Ganesha says: {name}, is there someone who feels small or left out that you could befriend today?",
+      },
+      {
+        text: "And so the mouse rode on Ganesha's shoulder, and together they helped everyone in the village.",
+        speakerLine: "Ganesha says: You are never too small to matter, {name}.",
+      },
+      {
+        text: "We are never too small to be needed. We are never too big to need a friend.",
+        wisdom: "Big or small, every friend matters.",
+        speakerLine: "Ganesha says: {name}, who will you make feel seen today?",
+      },
     ],
   },
   {
@@ -371,6 +432,7 @@ export const stories: Story[] = [
       { text: "Two great armies stood facing each other on the wide field of Kurukshetra. The morning was very still.", image: IMAGES.arjuna },
       {
         text: "Arjuna, the greatest archer in the world, looked across and saw his teachers, his uncles, his cousins — people he loved.",
+        speakerLine: "Arjuna says: {name}, have you ever had to do something hard because it was right?",
         choice: {
           question: "What do you think Arjuna's heart felt?",
           options: ["💔 A deep sadness", "😡 Pure anger", "😴 Nothing at all"],
@@ -378,8 +440,15 @@ export const stories: Story[] = [
           feedback: "Yes — even great heroes feel sadness. Feeling deeply is part of being brave.",
         },
       },
-      { text: "Arjuna lowered his bow. 'Krishna,' he whispered, 'I cannot fight. These are my own family.'" },
-      { text: "Krishna smiled gently. 'Arjuna, your dharma is to protect what is right. Do not run from what must be done — out of love or out of fear.'", wisdom: "Dharma means doing what is right, even when it is difficult." },
+      {
+        text: "Arjuna lowered his bow. 'Krishna,' he whispered, 'I cannot fight. These are my own family.'",
+        speakerLine: "Arjuna says: Even the greatest warriors feel afraid. That is not weakness — that is love.",
+      },
+      {
+        text: "Krishna smiled gently. 'Arjuna, your dharma is to protect what is right. Do not run from what must be done — out of love or out of fear.'",
+        wisdom: "Dharma means doing what is right, even when it is difficult.",
+        speakerLine: "Arjuna says: {name}, Krishna's words changed my life. What do they say to yours?",
+      },
     ],
   },
   {
@@ -410,6 +479,7 @@ export const stories: Story[] = [
       { text: "Draupadi was a princess known not for her crown, but for her wisdom and her clear, brave heart.", image: IMAGES.draupadi },
       {
         text: "One day in the great hall, she was treated unfairly. Many wise men sat around her — but no one said a word.",
+        speakerLine: "Draupadi says: {name}, a brave voice doesn't always shout. It simply speaks the truth.",
         choice: {
           question: "What did Draupadi do?",
           options: ["🔥 She spoke up", "🤫 She stayed silent", "🏃 She ran away"],
@@ -417,8 +487,15 @@ export const stories: Story[] = [
           feedback: "Yes! Speaking the truth, gently and bravely, is one of the greatest acts of dharma.",
         },
       },
-      { text: "She looked at the gathered kings and asked, 'Is there not one person here with the courage to speak the truth?'" },
-      { text: "Her words shook the whole hall. Even the silent felt ashamed. One brave voice can change everything.", wisdom: "Courage is speaking the truth — even when your voice trembles." },
+      {
+        text: "She looked at the gathered kings and asked, 'Is there not one person here with the courage to speak the truth?'",
+        speakerLine: "Draupadi says: {name}, if you were in that hall — what would you have said?",
+      },
+      {
+        text: "Her words shook the whole hall. Even the silent felt ashamed. One brave voice can change everything.",
+        wisdom: "Courage is speaking the truth — even when your voice trembles.",
+        speakerLine: "Draupadi says: Your voice matters too, {name}. Even when it trembles.",
+      },
     ],
   },
   {
@@ -449,6 +526,7 @@ export const stories: Story[] = [
       { text: "Eklavya was a boy from a forest village who dreamed of becoming a great archer. But no teacher would take him as a student.", image: IMAGES.eklavya },
       {
         text: "Instead of giving up, he made a small statue of the great teacher Dronacharya from clay.",
+        speakerLine: "Eklavya says: {name}, I had no teacher, no school. What did I have instead? Myself — and time.",
         choice: {
           question: "What did Eklavya do every single day?",
           options: ["🏹 Practiced — alone", "📺 Watched others", "😢 Felt sorry for himself"],
@@ -456,8 +534,15 @@ export const stories: Story[] = [
           feedback: "Yes! Practicing — even when no one is watching — is the greatest teacher.",
         },
       },
-      { text: "Every morning and every evening, he practiced his archery in front of the statue. Year after year." },
-      { text: "He became so skilled that he passed every student at the royal academy — without ever stepping inside.", wisdom: "Dedication and quiet practice can take you farther than any classroom." },
+      {
+        text: "Every morning and every evening, he practiced his archery in front of the statue. Year after year.",
+        speakerLine: "Eklavya says: Discipline is a quiet river, {name}. It doesn't rush. It just keeps going.",
+      },
+      {
+        text: "He became so skilled that he passed every student at the royal academy — without ever stepping inside.",
+        wisdom: "Dedication and quiet practice can take you farther than any classroom.",
+        speakerLine: "Eklavya says: {name}, what would you practice today — even if nobody was watching?",
+      },
     ],
   },
   {
@@ -488,6 +573,7 @@ export const stories: Story[] = [
       { text: "Savitri was a princess so wise and so loving that even the stars were said to listen when she spoke.", image: IMAGES.savitri },
       {
         text: "One twilight, a great being came to take her beloved away. Savitri did not weep. She simply followed.",
+        speakerLine: "Savitri says: {name}, the bravest thing I ever did was simply keep walking and keep asking.",
         choice: {
           question: "What did Savitri do as she walked?",
           options: ["💬 She asked wise questions", "😢 She cried loudly", "🏃 She tried to fight"],
@@ -495,8 +581,15 @@ export const stories: Story[] = [
           feedback: "Yes! Quiet wisdom and gentle questions can move even the strongest hearts.",
         },
       },
-      { text: "She walked and walked, asking gentle questions, until the great being said, 'You impress me. Ask for any gift.'" },
-      { text: "Savitri smiled. With one clever wish, she asked for something only her beloved being alive could give. Her love and her cleverness brought him back.", wisdom: "Love joined with wisdom can soften even the hardest heart." },
+      {
+        text: "She walked and walked, asking gentle questions, until the great being said, 'You impress me. Ask for any gift.'",
+        speakerLine: "Savitri says: {name}, what question have you been afraid to ask?",
+      },
+      {
+        text: "Savitri smiled. With one clever wish, she asked for something only her beloved being alive could give. Her love and her cleverness brought him back.",
+        wisdom: "Love joined with wisdom can soften even the hardest heart.",
+        speakerLine: "Savitri says: Love and wisdom together — {name}, you carry both already.",
+      },
     ],
   },
   {
@@ -527,6 +620,7 @@ export const stories: Story[] = [
       { text: "Prahlad was a young boy whose father was a powerful king who did not believe in the divine.", image: IMAGES.prahlad },
       {
         text: "But Prahlad loved the divine with his whole heart, and quietly prayed every day.",
+        speakerLine: "Prahlad says: {name}, love is the quietest kind of courage.",
         choice: {
           question: "What kept Prahlad steady when others tried to scare him?",
           options: ["💛 His love", "💪 His strength", "🏰 His palace"],
@@ -534,8 +628,15 @@ export const stories: Story[] = [
           feedback: "Yes! Love is a quiet kind of strength — softer than steel, and stronger.",
         },
       },
-      { text: "His father tried many things to stop him. But Prahlad simply smiled and said, 'The divine is in everything — even in you, Father.'" },
-      { text: "His quiet, loving faith protected him. The whole kingdom learned that gentleness can be the greatest power.", wisdom: "True faith is gentle, steady, and made of love." },
+      {
+        text: "His father tried many things to stop him. But Prahlad simply smiled and said, 'The divine is in everything — even in you, Father.'",
+        speakerLine: "Prahlad says: {name}, what do you love so much that nothing could shake it?",
+      },
+      {
+        text: "His quiet, loving faith protected him. The whole kingdom learned that gentleness can be the greatest power.",
+        wisdom: "True faith is gentle, steady, and made of love.",
+        speakerLine: "Prahlad says: Gentleness is not weakness, {name}. It is the strongest thing I know.",
+      },
     ],
   },
   {
@@ -566,6 +667,7 @@ export const stories: Story[] = [
       { text: "Dhruva was a small boy with a big sadness in his heart. He wished, more than anything, to be truly seen and loved.", image: IMAGES.dhruva },
       {
         text: "He walked alone into the forest. There, a wise sage taught him a single word to whisper, and a way of breathing slowly.",
+        speakerLine: "Dhruva says: {name}, I was sad and lonely once too. I sat very still. Want to try it with me?",
         choice: {
           question: "What did Dhruva do, all alone in the forest?",
           options: ["🧘 He sat very still and prayed", "😢 He gave up", "🏃 He ran home"],
@@ -573,9 +675,19 @@ export const stories: Story[] = [
           feedback: "Yes — quiet, steady practice can move even the stars.",
         },
       },
-      { text: "Days became months. Dhruva sat so still that birds rested on his shoulders. He never stopped his quiet whisper." },
-      { text: "The sky itself began to shine for him. A soft voice said, 'Dhruva, your steady heart has touched the heavens.'" },
-      { text: "Dhruva was placed in the night sky as the Pole Star — the one star that never moves, guiding every traveler home.", wisdom: "A steady heart shines longer than the brightest star." },
+      {
+        text: "Days became months. Dhruva sat so still that birds rested on his shoulders. He never stopped his quiet whisper.",
+        speakerLine: "Dhruva says: Stillness is not emptiness, {name}. It is a very full kind of quiet.",
+      },
+      {
+        text: "The sky itself began to shine for him. A soft voice said, 'Dhruva, your steady heart has touched the heavens.'",
+        speakerLine: "Dhruva says: The stars listened, {name}. They always do.",
+      },
+      {
+        text: "Dhruva was placed in the night sky as the Pole Star — the one star that never moves, guiding every traveler home.",
+        wisdom: "A steady heart shines longer than the brightest star.",
+        speakerLine: "Dhruva says: {name}, what will you be steady about — like the Pole Star?",
+      },
     ],
   },
   {
@@ -606,6 +718,7 @@ export const stories: Story[] = [
       { text: "Nachiketa was a bright boy who loved his father very much. One day, he asked a question his father didn't want to answer.", image: IMAGES.nachiketa },
       {
         text: "Instead of being upset, Nachiketa walked all the way to the great hall of Yama, the gentle keeper of endings, and waited politely for three days.",
+        speakerLine: "Nachiketa says: {name}, I asked a question grown-ups were afraid to ask. Are you that curious?",
         choice: {
           question: "What did Nachiketa ask Yama for?",
           options: ["📜 The truth about life", "🪙 Lots of gold", "🏰 A big kingdom"],
@@ -613,9 +726,19 @@ export const stories: Story[] = [
           feedback: "Yes! He cared more about understanding than about treasure.",
         },
       },
-      { text: "Yama smiled. 'I will give you anything you wish — gold, kingdoms, long life. Just don't ask me your hard question.'" },
-      { text: "But Nachiketa shook his head gently. 'I don't want gold. I want to understand what is true.'" },
-      { text: "Yama was so moved that he taught the boy the deepest secrets — that what is real inside us never ends.", wisdom: "Asking real questions, with a kind heart, opens the deepest doors." },
+      {
+        text: "Yama smiled. 'I will give you anything you wish — gold, kingdoms, long life. Just don't ask me your hard question.'",
+        speakerLine: "Nachiketa says: {name}, he offered me gold and kingdoms. What would you have chosen?",
+      },
+      {
+        text: "But Nachiketa shook his head gently. 'I don't want gold. I want to understand what is true.'",
+        speakerLine: "Nachiketa says: The best questions are the ones that make wise people stop and think, {name}.",
+      },
+      {
+        text: "Yama was so moved that he taught the boy the deepest secrets — that what is real inside us never ends.",
+        wisdom: "Asking real questions, with a kind heart, opens the deepest doors.",
+        speakerLine: "Nachiketa says: {name}, what is the one question you would ask if you could ask anything?",
+      },
     ],
   },
   {
@@ -646,6 +769,7 @@ export const stories: Story[] = [
       { text: "Markandeya was a kind little boy who loved sitting in the temple, hugging the smooth stone of Shiva, singing softly.", image: IMAGES.markandeya },
       {
         text: "One day, the gentle figure of Time came to take him away. Markandeya didn't run. He held on tighter to the stone he loved.",
+        speakerLine: "Markandeya says: {name}, I held on to what I loved. That is all I did.",
         choice: {
           question: "What gave Markandeya his courage?",
           options: ["💛 His love", "🏃 Running fast", "🤐 Hiding"],
@@ -653,8 +777,15 @@ export const stories: Story[] = [
           feedback: "Yes — love is older and stronger than even time itself.",
         },
       },
-      { text: "A great warmth filled the temple. Shiva himself appeared and said, 'A heart this loving cannot be carried away by time.'" },
-      { text: "Markandeya was blessed to stay forever young. The river of time still flows — but love stands gently outside of it.", wisdom: "Love is the one thing that time cannot take." },
+      {
+        text: "A great warmth filled the temple. Shiva himself appeared and said, 'A heart this loving cannot be carried away by time.'",
+        speakerLine: "Markandeya says: {name}, what would you hold on to, no matter what?",
+      },
+      {
+        text: "Markandeya was blessed to stay forever young. The river of time still flows — but love stands gently outside of it.",
+        wisdom: "Love is the one thing that time cannot take.",
+        speakerLine: "Markandeya says: Love is older than time, {name}. It always will be.",
+      },
     ],
   },
 ];

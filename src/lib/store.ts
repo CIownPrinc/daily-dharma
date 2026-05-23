@@ -83,6 +83,14 @@ type DharmaStore = {
   setAgeStageOverride: (v: AgeStage | null) => void;
   /** Resolved age stage: override → profile → default "Curious" */
   resolvedAgeStage: () => AgeStage;
+
+  /**
+   * Ephemeral flag: true for exactly one render-cycle after _hydrateProgress
+   * increments the streak. The home screen fires a toast then calls
+   * clearStreakToast(). NOT persisted — session-only signal.
+   */
+  justEarnedStreak: boolean;
+  clearStreakToast: () => void;
 };
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
@@ -134,6 +142,8 @@ export const useDharmaStore = create<DharmaStore>()(
       // ── Progress ─────────────────────────────────────────────────────────────
       progress: initialProgress,
       progressHydrated: false,
+      justEarnedStreak: false,
+      clearStreakToast: () => set({ justEarnedStreak: false }),
 
       _hydrateProgress: () => {
         const today = todayStr();
@@ -144,13 +154,17 @@ export const useDharmaStore = create<DharmaStore>()(
           return;
         }
 
-        const newStreak =
-          p.lastVisit === yesterdayStr() ? p.streak + 1 : 1;
+        const isConsecutive = p.lastVisit === yesterdayStr();
+        const newStreak = isConsecutive ? p.streak + 1 : 1;
+        // Fire the streak toast only when extending a streak (≥2 days),
+        // not on day 1 (that would be noisy for new users every session).
+        const justEarnedStreak = isConsecutive && newStreak >= 2;
 
         set({
           progress: { ...p, streak: newStreak, lastVisit: today },
           progressHydrated: true,
           profileHydrated: true,
+          justEarnedStreak,
         });
 
         // Re-apply dark mode on hydration (class is lost on page reload)
@@ -216,8 +230,16 @@ export const useDharmaStore = create<DharmaStore>()(
       // ── Settings ─────────────────────────────────────────────────────────────
       settings: initialSettings,
 
-      setNarratorEnabled: (v) =>
-        set((s) => ({ settings: { ...s.settings, narratorEnabled: v } })),
+      setNarratorEnabled: (v) => {
+        // Sync to the singleton immediately so narration stops/starts
+        // without requiring a component re-render.
+        if (typeof window !== "undefined") {
+          import("@/lib/narrator").then(({ getNarrator }) => {
+            getNarrator().setEnabled(v);
+          });
+        }
+        set((s) => ({ settings: { ...s.settings, narratorEnabled: v } }));
+      },
 
       toggleDarkMode: () => {
         const next = !get().settings.darkMode;

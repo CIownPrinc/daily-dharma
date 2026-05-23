@@ -220,11 +220,11 @@ function StoryPage() {
               {page.text}
             </p>
 
-            {/* Character speech bubble — page 1 only (second page of the story).
-                The guide character addresses the child by name to create a direct,
-                personal connection. This is the key identity-formation mechanic:
-                the character speaks *to* this specific child, not to a generic reader. */}
-            {pageIdx === 1 && (
+            {/* Character speech bubble — shown on any page that has a speakerLine.
+                The line is written in the character's voice and addresses the child
+                by first name via {name} placeholder, replaced at render time.
+                Page 0 never shows a bubble (let the story open first). */}
+            {pageIdx > 0 && page.speakerLine && (
               <div
                 className="mb-4 flex items-start gap-3 rounded-2xl p-4 ring-1 ring-ink/5 animate-scene"
                 style={{ background: `${story.sceneColor}0d` }}
@@ -242,8 +242,8 @@ function StoryPage() {
                   </div>
                   <p className="font-serif italic text-ink text-[15px] leading-relaxed">
                     {firstName
-                      ? `${firstName}, listen carefully — every story holds a secret just for you.`
-                      : "Listen carefully — every story holds a secret just for you."}
+                      ? page.speakerLine.replace(/\{name\}/g, firstName)
+                      : page.speakerLine.replace(/\{name\},?\s*/g, "").trim()}
                   </p>
                 </div>
               </div>

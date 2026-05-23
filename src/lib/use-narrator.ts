@@ -1,58 +1,44 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-
 /**
- * Browser-native narrator using the Web Speech API.
- * Free, offline, and works on iOS/Android/desktop. Picks the warmest
- * available voice (prefers female English voices).
+ * useNarrator — thin React adapter over the Narrator singleton.
+ *
+ * This hook no longer owns any SpeechSynthesis state. It:
+ *   1. Gets the singleton via getNarrator()
+ *   2. Subscribes to speaking-state changes and reflects them in React state
+ *   3. Reads narratorEnabled from the Zustand store and syncs it to the
+ *      singleton when it changes
+ *
+ * The singleton is NOT cancelled on unmount, so narration survives route
+ * changes. If the child navigates from page 2 → page 3, the current
+ * utterance finishes naturally before the next one starts.
  */
+import { useEffect, useState, useCallback } from "react";
+import { getNarrator } from "@/lib/narrator";
+import { useDharmaStore } from "@/lib/store";
+
 export function useNarrator() {
-  const [supported, setSupported] = useState(false);
-  const [speaking, setSpeaking] = useState(false);
-  const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
+  const narrator = getNarrator();
+  const [speaking, setSpeaking] = useState(narrator.speaking);
+  const narratorEnabled = useDharmaStore((s) => s.settings.narratorEnabled);
 
+  // Sync the enabled flag into the singleton whenever the setting changes.
   useEffect(() => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    setSupported(true);
+    narrator.setEnabled(narratorEnabled);
+  }, [narratorEnabled, narrator]);
 
-    const pickVoice = () => {
-      const voices = window.speechSynthesis.getVoices();
-      if (!voices.length) return;
-      // Warm/female English voices first; fallback to any English voice.
-      const preferred =
-        voices.find((v) => /samantha|karen|tessa|moira|fiona/i.test(v.name)) ||
-        voices.find((v) => /female/i.test(v.name) && /en/i.test(v.lang)) ||
-        voices.find((v) => /^en/i.test(v.lang)) ||
-        voices[0];
-      voiceRef.current = preferred ?? null;
-    };
+  // Subscribe to speaking state — update React state when it changes.
+  // The subscription is cleaned up on unmount but the narrator keeps running.
+  useEffect(() => {
+    const unsub = narrator.subscribe(setSpeaking);
+    return () => unsub();
+  }, [narrator]);
 
-    pickVoice();
-    window.speechSynthesis.onvoiceschanged = pickVoice;
+  const speak = useCallback((text: string) => narrator.speak(text), [narrator]);
+  const stop  = useCallback(() => narrator.stop(),         [narrator]);
 
-    return () => {
-      window.speechSynthesis.cancel();
-    };
-  }, []);
-
-  const stop = useCallback(() => {
-    if (typeof window === "undefined") return;
-    window.speechSynthesis.cancel();
-    setSpeaking(false);
-  }, []);
-
-  const speak = useCallback((text: string) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
-    if (voiceRef.current) utter.voice = voiceRef.current;
-    utter.rate = 0.9; // gentle, bedtime-tale pace
-    utter.pitch = 1.05;
-    utter.volume = 1;
-    utter.onstart = () => setSpeaking(true);
-    utter.onend = () => setSpeaking(false);
-    utter.onerror = () => setSpeaking(false);
-    window.speechSynthesis.speak(utter);
-  }, []);
-
-  return { supported, speaking, speak, stop };
+  return {
+    supported: narrator.supported,
+    speaking,
+    speak,
+    stop,
+  };
 }

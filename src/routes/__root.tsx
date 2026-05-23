@@ -1,5 +1,5 @@
 import { Outlet, createRootRoute, HeadContent, Scripts, Link } from "@tanstack/react-router";
-
+import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -74,6 +74,16 @@ function RootShell({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            classNames: {
+              toast: "font-sans rounded-2xl shadow-petal ring-1 ring-ink/5",
+              title: "font-bold text-ink",
+              description: "text-ink-soft",
+            },
+          }}
+        />
         <Scripts />
       </body>
     </html>

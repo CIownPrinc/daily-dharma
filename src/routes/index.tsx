@@ -13,6 +13,8 @@
  *      no layout shift, no performance cost.
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
 import { StoryCard } from "@/components/story-card";
 import { MissionCard } from "@/components/mission-card";
@@ -23,6 +25,7 @@ import { OmBreathing } from "@/components/om-breathing";
 import { stories, missions, chants } from "@/lib/dharma-data";
 import { useProfile } from "@/lib/use-profile";
 import { useProgress } from "@/lib/use-progress";
+import { useDharmaStore } from "@/lib/store";
 import { getLevel } from "@/lib/levels";
 
 export const Route = createFileRoute("/")({
@@ -50,6 +53,31 @@ function HomePage() {
   const firstName = profile?.name?.split(" ")[0] ?? null;
   const petals = hydrated ? progress.petals : 0;
   const level = getLevel(petals);
+  const justEarnedStreak = useDharmaStore((s) => s.justEarnedStreak);
+  const clearStreakToast = useDharmaStore((s) => s.clearStreakToast);
+
+  // Fire streak toast once, immediately after hydration sets the flag.
+  // clearStreakToast() resets the flag so it never fires twice.
+  useEffect(() => {
+    if (!justEarnedStreak) return;
+    const streak = progress.streak;
+    const messages: Record<number, string> = {
+      2:  "Two days in a row! The journey continues. 🌱",
+      3:  "Three days of stories! The flame grows. 🔥",
+      5:  "Five days! You're becoming a true Seeker. ✨",
+      7:  "Seven days — a full week of wisdom! 🌟",
+      10: "Ten days in a row! Hanuman himself is proud. 🐒",
+      14: "Fourteen days! You walk the dharma path. 🪷",
+      21: "Three weeks! The world bows to your dedication. 🙏",
+      30: "Thirty days. You are a Dharma Keeper now. 🏆",
+    };
+    const msg = messages[streak] ?? `${streak} days in a row! Keep the light burning. 🔥`;
+    toast(msg, {
+      duration: 4500,
+      icon: "🔥",
+    });
+    clearStreakToast();
+  }, [justEarnedStreak, clearStreakToast, progress.streak]);
 
   return (
     <AppShell>
