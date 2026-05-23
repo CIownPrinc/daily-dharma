@@ -283,3 +283,122 @@
   50% { opacity: 0.8; }
 }
 .animate-soft-pulse { animation: soft-pulse 3s ease-in-out infinite; }
+
+/* ─── JOURNEY HERO — night sky variant ──────────────────────────────────────
+ * Same CSS-only technique as home-hero but in deep indigo/purple tones.
+ * The darker palette signals exploration and mystery vs. the home screen's
+ * warm sunrise. No JS, no images, no layout shift.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+.journey-hero-sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    170deg,
+    oklch(0.13 0.06 280) 0%,
+    oklch(0.20 0.10 270) 30%,
+    oklch(0.28 0.12 255) 60%,
+    oklch(0.22 0.08 290) 85%,
+    oklch(0.16 0.06 300) 100%
+  );
+}
+
+/* Dense starfield for the night sky — four layers at different scales */
+.journey-hero-stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255,255,255,0.7) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255,255,255,0.3) 1.5px, transparent 1.5px);
+  background-size: 120px 100px, 80px 90px, 160px 140px, 200px 170px;
+  background-position: 10px 15px, 55px 35px, 90px 60px, 20px 80px;
+  animation: starfield 6s ease-in-out infinite alternate;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Crescent moon — CSS shapes only */
+.journey-hero-moon {
+  position: absolute;
+  top: 24px;
+  right: 36px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 10px -4px 0 2px oklch(0.92 0.05 85);
+  filter: drop-shadow(0 0 12px oklch(0.92 0.05 85 / 0.4));
+  animation: fuA 1.2s ease-out;
+  pointer-events: none;
+}
+
+/* Mountain silhouette — darker/deeper than the home variant */
+.journey-hero-mountains {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to top, oklch(0.13 0.06 280) 0%, transparent 100%);
+  clip-path: polygon(
+    0% 100%,
+    0% 65%,
+    7%  55%,
+    15% 30%,
+    22% 50%,
+    30% 15%,
+    40% 45%,
+    50% 5%,
+    62% 40%,
+    72% 22%,
+    82% 48%,
+    90% 30%,
+    96% 44%,
+    100% 36%,
+    100% 100%
+  );
+  pointer-events: none;
+}
+
+/* ─── STORY CARD / IMAGE SHIMMER ────────────────────────────────────────────
+ * Applied to any element with .img-shimmer while its image is loading.
+ * The shimmer is a CSS animation — no JS needed for the animation itself.
+ * The React component adds/removes the class based on img onLoad/onError.
+ * ─────────────────────────────────────────────────────────────────────────── */
+.img-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: oklch(0.94 0.01 80);
+}
+
+.img-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(0.98 0.005 80 / 0.6) 40%,
+    oklch(0.98 0.005 80 / 0.8) 50%,
+    oklch(0.98 0.005 80 / 0.6) 60%,
+    transparent 100%
+  );
+  animation: shimmer-sweep 1.6s ease-in-out infinite;
+  transform: translateX(-100%);
+}
+
+@keyframes shimmer-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+/* ─── OM BREATHING — circular progress ring ─────────────────────────────────
+ * The SVG ring is rendered by the component; these are supporting animations.
+ * ─────────────────────────────────────────────────────────────────────────── */
+@keyframes breath-glow {
+  0%, 100% { filter: drop-shadow(0 0 6px oklch(0.65 0.20 330 / 0.3)); }
+  50%       { filter: drop-shadow(0 0 18px oklch(0.65 0.20 330 / 0.6)); }
+}
+.breath-ring-glow { animation: breath-glow 2s ease-in-out infinite; }

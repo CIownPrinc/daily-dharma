@@ -66,8 +66,13 @@ function StoryPage() {
   const { story } = Route.useLoaderData() as { story: Story };
   const [pageIdx, setPageIdx] = useState(0);
   const [finished, setFinished] = useState(false);
+  // Captured at the moment the child finishes — before completeStory mutates
+  // the store. This is the only reliable way to know if this is a first-ever
+  // completion vs. a re-read, because the store updates synchronously and
+  // any check *after* completeStory() will always return true.
+  const [isFirstCompletion, setIsFirstCompletion] = useState(false);
   const [choiceIdx, setChoiceIdx] = useState<number | null>(null);
-  const { completeStory } = useProgress();
+  const { completeStory, progress } = useProgress();
   const { profile } = useProfile();
   const narratorEnabled = useDharmaStore((s) => s.settings.narratorEnabled);
   const narrator = useNarrator();
@@ -97,7 +102,9 @@ function StoryPage() {
   const next = () => {
     if (choiceLocked) return;
     if (isLast) {
-      // Pass the badge to the store so it's recorded on first completion
+      // Capture first-completion state BEFORE the store updates
+      const alreadyDone = progress.completedStories.includes(story.slug);
+      setIsFirstCompletion(!alreadyDone);
       completeStory(story.slug, {
         slug: story.slug,
         name: story.badge.name,
@@ -120,7 +127,7 @@ function StoryPage() {
   if (finished) {
     return (
       <AppShell>
-        <FinishView story={story} />
+        <FinishView story={story} isFirstCompletion={isFirstCompletion} />
       </AppShell>
     );
   }
@@ -332,7 +339,7 @@ function StoryPage() {
   );
 }
 
-function FinishView({ story }: { story: Story }) {
+function FinishView({ story, isFirstCompletion }: { story: Story; isFirstCompletion: boolean }) {
   const { progress, saveReflection, completeMission, isMissionCompletedToday, hydrated } =
     useProgress();
   const existing = progress.reflections[story.slug]?.text ?? "";
@@ -353,14 +360,11 @@ function FinishView({ story }: { story: Story }) {
   const idx = stories.findIndex((s) => s.slug === story.slug);
   const nextStory = idx >= 0 ? stories[(idx + 1) % stories.length] : null;
 
-  // Check if this badge was just earned (not previously in progress)
-  const isNewBadge = !progress.earnedBadges.slice(0, -1).some(
-    (b) => b.slug === story.slug
-  );
-
   return (
     <div className="max-w-2xl mx-auto pb-10">
-      <Confetti />
+      {/* Confetti only on first completion — re-reading feels rewarding
+          but shouldn't re-trigger the full celebration every time. */}
+      <Confetti run={isFirstCompletion} />
 
       {/* Badge ring — the emotional peak of the session */}
       <div className="bg-card rounded-[2rem] ring-1 ring-ink/5 shadow-petal p-8 md:p-12 mb-6 text-center">
@@ -371,7 +375,7 @@ function FinishView({ story }: { story: Story }) {
           <p className="font-serif italic text-lg text-ink">{story.lesson}</p>
         </div>
 
-        {isNewBadge && (
+        {isFirstCompletion && (
           <p className="text-ink-soft font-medium text-sm mt-4">
             +3 petals earned · Badge added to your Sanctuary
           </p>
