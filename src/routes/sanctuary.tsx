@@ -197,40 +197,131 @@ function SanctuaryPage() {
       {/* Character gallery */}
       <CharacterGallery />
 
-      {/* Tales heard */}
+      {/* Gallery of Tales — memory wall */}
       <section className="mb-10">
-        <h2 className="font-serif text-xl md:text-2xl text-ink mb-4">Tales you've heard</h2>
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <h2 className="font-serif text-xl md:text-2xl text-ink">Gallery of Tales</h2>
+            {finished.length > 0 && (
+              <p className="text-[12px] text-ink-soft font-medium mt-0.5">
+                {finished.length} {finished.length === 1 ? "tale" : "tales"} in your memory
+              </p>
+            )}
+          </div>
+          {finished.length > 0 && (
+            <Link
+              to="/library"
+              search={{ view: "all", q: "" }}
+              className="text-sm font-bold text-lotus hover:underline"
+            >
+              Find more →
+            </Link>
+          )}
+        </div>
+
         {finished.length === 0 ? (
-          <div className="bg-card rounded-3xl p-8 ring-1 ring-ink/5 text-center">
-            <div className="text-3xl mb-3" aria-hidden>✿</div>
-            <p className="text-ink-soft font-medium">No tales finished yet — your library awaits.</p>
+          <div className="bg-card rounded-3xl p-10 ring-1 ring-ink/5 text-center">
+            <div className="text-4xl mb-3" aria-hidden>🖼️</div>
+            <p className="text-ink-soft font-medium mb-2">
+              Your gallery is empty — but not for long.
+            </p>
+            <p className="text-ink-soft/70 text-sm mb-5">
+              Each tale you finish adds a painting here. Come back after your first story.
+            </p>
+            <Link
+              to="/library"
+              search={{ view: "default", q: "" }}
+              className="inline-block bg-lotus text-primary-foreground px-5 py-2.5 rounded-full font-bold text-sm hover:bg-lotus-deep transition-colors"
+            >
+              Start a tale →
+            </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {finished.map((s) => (
-              <Link
-                key={s.slug}
-                to="/story/$slug"
-                params={{ slug: s.slug }}
-                className="bg-card rounded-2xl p-2 ring-1 ring-ink/5 shadow-soft group hover:shadow-petal transition-shadow"
-              >
-                <div className="aspect-square rounded-xl overflow-hidden bg-lotus-soft mb-2">
-                  <img
-                    src={s.image}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            {finished.map((s) => {
+              const badge = earnedBadges.find((b) => b.slug === s.slug);
+              // completionDates records the ISO date when each story was first
+              // completed. Fall back to earnedBadges.earnedAt for stories
+              // completed before Phase 6, then no date for very old records.
+              const dateStr =
+                progress.completionDates?.[s.slug] ??
+                badge?.earnedAt ??
+                null;
+              const formattedDate = dateStr
+                ? new Date(dateStr).toLocaleDateString("en-US", {
+                    month: "short", day: "numeric", year: "numeric",
+                  })
+                : null;
+
+              return (
+                <Link
+                  key={s.slug}
+                  to="/story/$slug"
+                  params={{ slug: s.slug }}
+                  className="group bg-card rounded-3xl overflow-hidden ring-1 ring-ink/5 shadow-soft hover:shadow-petal transition-all duration-300"
+                >
+                  {/* Painting — 3:2 ratio, fills the card top */}
+                  <div className="aspect-[3/2] overflow-hidden relative">
+                    <img
+                      src={s.image}
+                      alt={s.title}
+                      width={900}
+                      height={600}
+                      loading="lazy"
                       referrerPolicy="no-referrer"
-                    alt={s.title}
-                    width={1024}
-                    height={768}
-                    loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="px-1.5 pb-1.5">
-                  <p className="text-xs font-bold text-ink leading-snug truncate">{s.title}</p>
-                  <p className="text-[10px] font-bold text-lotus mt-0.5">{s.badge.icon} {s.badge.name}</p>
-                </div>
-              </Link>
-            ))}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    {/* Scene color gradient overlay at bottom */}
+                    <div
+                      className="absolute inset-x-0 bottom-0 h-16 pointer-events-none"
+                      style={{ background: `linear-gradient(to top, ${s.sceneColor}cc, transparent)` }}
+                      aria-hidden
+                    />
+                    {/* Badge chip on top-right */}
+                    {badge && (
+                      <div
+                        className="absolute top-2.5 right-2.5 size-9 rounded-full flex items-center justify-center text-lg shadow-petal"
+                        style={{ background: `${s.sceneColor}dd` }}
+                        title={badge.name}
+                        aria-label={`Badge: ${badge.name}`}
+                      >
+                        {s.badge.icon}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card body */}
+                  <div className="p-4">
+                    <div className="text-[10px] font-bold uppercase tracking-widest mb-1"
+                      style={{ color: s.sceneColor }}>
+                      {s.realm}
+                    </div>
+                    <h3 className="font-serif text-base text-ink leading-snug mb-1">
+                      {s.title}
+                    </h3>
+                    {/* Lesson — one-line reminder of the core wisdom */}
+                    <p className="text-[12px] text-ink-soft font-medium italic leading-snug mb-3 line-clamp-1">
+                      "{s.lesson}"
+                    </p>
+
+                    <div className="flex items-center justify-between gap-2">
+                      {badge ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[11px] font-bold text-lotus">
+                            {badge.virtue}
+                          </span>
+                        </div>
+                      ) : <div />}
+                      {formattedDate && (
+                        <span className="text-[10px] font-bold text-ink-soft tabular-nums">
+                          {formattedDate}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </section>

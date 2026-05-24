@@ -236,30 +236,48 @@ function StoryPage() {
             </p>
 
             {/* Character speech bubble — shown on any page that has a speakerLine.
-                The line is written in the character's voice and addresses the child
-                by first name via {name} placeholder, replaced at render time.
-                Page 0 never shows a bubble (let the story open first). */}
+                The bubble is a mini-dialogue: character icon left, child avatar
+                right. This makes it feel like a direct conversation, not a lecture.
+                Page 0 never shows (let the story breathe first). */}
             {pageIdx > 0 && page.speakerLine && (
               <div
-                className="mb-4 flex items-start gap-3 rounded-2xl p-4 ring-1 ring-ink/5 animate-scene"
+                className="mb-4 rounded-2xl p-4 ring-1 ring-ink/5 animate-scene"
                 style={{ background: `${story.sceneColor}0d` }}
               >
-                <div
-                  className="size-11 rounded-xl flex items-center justify-center text-2xl shrink-0 ring-1 ring-ink/5"
-                  style={{ background: `${story.sceneColor}18` }}
-                  aria-hidden
-                >
-                  {story.character.emoji}
-                </div>
-                <div className="min-w-0">
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-lotus mb-1">
-                    {story.character.name} says
+                <div className="flex items-start gap-3">
+                  {/* Character avatar */}
+                  <div
+                    className="size-11 rounded-xl flex items-center justify-center text-2xl shrink-0 ring-1 ring-ink/5"
+                    style={{ background: `${story.sceneColor}18` }}
+                    aria-hidden
+                  >
+                    {story.character.emoji}
                   </div>
-                  <p className="font-serif italic text-ink text-[15px] leading-relaxed">
-                    {firstName
-                      ? page.speakerLine.replace(/\{name\}/g, firstName)
-                      : page.speakerLine.replace(/\{name\},?\s*/g, "").trim()}
-                  </p>
+
+                  {/* Speech text */}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-lotus mb-1">
+                      {story.character.name} says
+                    </div>
+                    <p className="font-serif italic text-ink text-[15px] leading-relaxed">
+                      {firstName
+                        ? page.speakerLine.replace(/\{name\}/g, firstName)
+                        : page.speakerLine.replace(/\{name\},?\s*/g, "").trim()}
+                    </p>
+                  </div>
+
+                  {/* Child's avatar — the "listener" in the conversation.
+                      Only shown when a profile exists, so it feels personal.
+                      Gentle opacity: present but not competing for attention. */}
+                  {profile?.avatar && (
+                    <div
+                      className="size-9 rounded-xl flex items-center justify-center text-xl shrink-0 self-end mb-0.5 opacity-70"
+                      style={{ background: `${story.sceneColor}10` }}
+                      aria-label={`${firstName ?? "You"} listening`}
+                    >
+                      {profile.avatar}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -424,32 +442,7 @@ function FinishView({ story, isFirstCompletion }: { story: Story; isFirstComplet
       </section>
 
       {/* Post-story mission */}
-      <section className="bg-leaf-soft rounded-3xl p-6 ring-1 ring-leaf/15 mb-6">
-        <div className="text-[11px] font-bold uppercase tracking-widest text-leaf-deep mb-2">Now Take It Into the World</div>
-        <h3 className="font-serif text-xl text-ink mb-1">{mission.title}</h3>
-        <p className="text-ink-soft font-medium leading-relaxed text-[15px] mb-4">{mission.description}</p>
-        <button
-          onClick={() => !missionDone && completeMission(mission.id)}
-          disabled={missionDone}
-          className={cn(
-            "inline-flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm transition-colors",
-            missionDone
-              ? "bg-leaf text-primary-foreground cursor-default"
-              : "bg-card text-leaf-deep ring-1 ring-leaf/30 hover:bg-leaf hover:text-primary-foreground",
-          )}
-        >
-          <span
-            className={cn(
-              "size-5 rounded-full border-2 flex items-center justify-center text-[10px]",
-              missionDone ? "border-primary-foreground bg-primary-foreground/20" : "border-current",
-            )}
-            aria-hidden
-          >
-            {missionDone ? "✓" : ""}
-          </span>
-          {missionDone ? "Done — well lived" : "I'll do this today"}
-        </button>
-      </section>
+      <MissionSection mission={mission} missionDone={missionDone} completeMission={completeMission} />
 
       {/* Navigation CTAs */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -467,5 +460,103 @@ function FinishView({ story, isFirstCompletion }: { story: Story; isFirstComplet
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * MissionSection — mission card with completion micro-animation.
+ *
+ * On click:
+ *   1. Button scales down then bounces back (CSS keyframe: mission-bounce).
+ *   2. A "+1 petal 🌸" chip floats upward and fades out (mission-petal-float).
+ *   3. Button transitions to the green "Done" state.
+ *   4. Ripple ring expands outward from the button centre.
+ *
+ * All animations are CSS — no library, no JS timers for the visual effects.
+ * The `justCompleted` flag is set on click, triggers animations via className,
+ * and is never reset (the button stays in completed state).
+ */
+function MissionSection({
+  mission,
+  missionDone,
+  completeMission,
+}: {
+  mission: Mission;
+  missionDone: boolean;
+  completeMission: (id: string) => void;
+}) {
+  const [justCompleted, setJustCompleted] = useState(false);
+
+  const handleClick = () => {
+    if (missionDone) return;
+    completeMission(mission.id);
+    setJustCompleted(true);
+  };
+
+  return (
+    <section className="bg-leaf-soft rounded-3xl p-6 ring-1 ring-leaf/15 mb-6">
+      <div className="text-[11px] font-bold uppercase tracking-widest text-leaf-deep mb-2">
+        Now Take It Into the World
+      </div>
+      <h3 className="font-serif text-xl text-ink mb-1">{mission.title}</h3>
+      <p className="text-ink-soft font-medium leading-relaxed text-[15px] mb-5">
+        {mission.description}
+      </p>
+
+      <div className="relative inline-block">
+        {/* Floating "+1 petal" chip — appears on completion, floats up, fades */}
+        {justCompleted && (
+          <div
+            className="absolute -top-8 left-1/2 -translate-x-1/2 pointer-events-none
+                       animate-petal-float text-sm font-bold text-leaf-deep
+                       bg-card rounded-full px-3 py-1 shadow-soft ring-1 ring-leaf/20
+                       whitespace-nowrap"
+            aria-hidden
+          >
+            +1 petal 🌸
+          </div>
+        )}
+
+        {/* Ripple ring — expands from button on completion */}
+        {justCompleted && (
+          <span
+            className="absolute inset-0 rounded-full bg-leaf/30 animate-mission-ripple pointer-events-none"
+            aria-hidden
+          />
+        )}
+
+        <button
+          onClick={handleClick}
+          disabled={missionDone}
+          className={cn(
+            "relative inline-flex items-center gap-3 px-6 py-3.5 rounded-full font-bold text-sm",
+            "transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2",
+            "focus-visible:ring-leaf focus-visible:ring-offset-2",
+            missionDone
+              ? "bg-leaf text-primary-foreground cursor-default shadow-petal"
+              : "bg-card text-leaf-deep ring-1 ring-leaf/30 hover:bg-leaf/10 active:scale-95",
+            justCompleted && "animate-mission-bounce",
+          )}
+        >
+          {/* Checkbox circle */}
+          <span
+            className={cn(
+              "size-5 rounded-full border-2 flex items-center justify-center text-[10px] flex-shrink-0",
+              "transition-all duration-300",
+              missionDone
+                ? "border-primary-foreground/60 bg-primary-foreground/20 scale-110"
+                : "border-current",
+            )}
+            aria-hidden
+          >
+            {missionDone && "✓"}
+          </span>
+
+          <span className="transition-all duration-300">
+            {missionDone ? "Done — well lived" : "I'll do this today"}
+          </span>
+        </button>
+      </div>
+    </section>
   );
 }

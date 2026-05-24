@@ -42,6 +42,8 @@ export type Progress = {
   completedMissions: string[];
   reflections: Record<string, { text: string; date: string }>;
   earnedBadges: EarnedBadge[];
+  /** ISO date string (yyyy-mm-dd) keyed by story slug. Set on first completion. */
+  completionDates: Record<string, string>;
 };
 
 export type Settings = {
@@ -119,6 +121,7 @@ const initialProgress: Progress = {
   completedMissions: [],
   reflections: {},
   earnedBadges: [],
+  completionDates: {},
 };
 
 const initialSettings: Settings = {
@@ -186,6 +189,7 @@ export const useDharmaStore = create<DharmaStore>()(
               completedStories: [...p.completedStories, slug],
               petals: p.petals + 3,
               earnedBadges: updatedBadges,
+              completionDates: { ...p.completionDates, [slug]: todayStr() },
             },
           };
         }),
@@ -291,6 +295,7 @@ export const useDharmaStore = create<DharmaStore>()(
                 ...initialProgress,
                 ...op,
                 earnedBadges: state.progress.earnedBadges ?? [],
+                completionDates: state.progress.completionDates ?? {},
               };
             }
           } catch { /* ignore */ }

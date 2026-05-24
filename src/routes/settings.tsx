@@ -65,7 +65,7 @@ function SettingsPage() {
 
   const handleResetProgress = () => {
     // Clear all progress but keep profile — child keeps their name/avatar
-    useDharmaStore.setState((s) => ({
+    useDharmaStore.setState((_s) => ({
       progress: {
         petals: 0,
         streak: 0,
@@ -74,6 +74,7 @@ function SettingsPage() {
         completedMissions: [],
         reflections: {},
         earnedBadges: [],
+        completionDates: {},
       },
     }));
     setShowResetConfirm(false);
