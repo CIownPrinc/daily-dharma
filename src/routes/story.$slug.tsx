@@ -76,22 +76,30 @@ function StoryPage() {
   const { profile } = useProfile();
   const narratorEnabled = useDharmaStore((s) => s.settings.narratorEnabled);
   const narrator = useNarrator();
+  // Keep stable references to speak/stop so effect deps don't change each render.
+  // narrator.speak and narrator.stop are already useCallback-wrapped in the hook.
+  const { speak, stop, supported } = narrator;
 
-  // Stop narration when page changes or component unmounts
+  // Single effect handles both cleanup and auto-play.
+  // Merging eliminates the race condition where two effects both watched pageIdx:
+  //   Old cleanup: stop() fired AFTER new effect's speak() on fast page turns.
+  // Now: cleanup cancels the timer AND stops speech → then body schedules new speak.
   useEffect(() => {
-    return () => narrator.stop();
-  }, [pageIdx, narrator]);
-
-  // Auto-read when narratorEnabled is on and a new page loads
-  useEffect(() => {
-    if (!narratorEnabled || !narrator.supported) return;
+    if (!narratorEnabled || !supported) {
+      return () => stop();
+    }
     const page = story.pages[pageIdx];
-    if (!page) return;
+    if (!page) return () => stop();
     const text = [page.text, page.wisdom].filter(Boolean).join(". ");
-    // Small delay so the page transition animation completes first
-    const t = setTimeout(() => narrator.speak(text), 350);
-    return () => clearTimeout(t);
-  }, [pageIdx, narratorEnabled, narrator, story.pages]);
+    // 350ms delay so the page slide animation completes before speech starts.
+    const t = setTimeout(() => speak(text), 350);
+    return () => {
+      clearTimeout(t);
+      stop();
+    };
+  // speak and stop are stable useCallback refs — safe in deps, never stale.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageIdx, narratorEnabled, supported]);
 
   const firstName = profile?.name?.split(" ")[0] ?? null;
 
@@ -161,15 +169,14 @@ function StoryPage() {
               />
             ))}
           </div>
-          {/* Narrator button — only shown when narrator is supported.
-              When narratorEnabled is true in settings, narration auto-plays
-              and this button acts as a manual pause/restart control. */}
-          {narrator.supported && (
+          {/* Narrator button — toggle narration manually.
+              Uses the same stable speak/stop refs from the effect above. */}
+          {supported && (
             <button
               type="button"
               onClick={() => {
-                if (narrator.speaking) narrator.stop();
-                else narrator.speak([page.text, page.wisdom].filter(Boolean).join(". "));
+                if (narrator.speaking) stop();
+                else speak([page.text, page.wisdom].filter(Boolean).join(". "));
               }}
               className={cn(
                 "inline-flex items-center gap-2 text-xs font-bold rounded-full px-3 py-1.5 ring-1 transition-colors",
@@ -190,6 +197,7 @@ function StoryPage() {
           <div className="aspect-[4/3] md:aspect-[16/9] w-full overflow-hidden">
             <img
               src={page.image ?? story.image}
+                  referrerPolicy="no-referrer"
               alt={story.title}
               width={1024}
               height={768}

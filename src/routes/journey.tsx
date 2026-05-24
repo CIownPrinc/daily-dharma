@@ -337,6 +337,7 @@ function StoryThumb({
         width={256}
         height={192}
         loading="lazy"
+        referrerPolicy="no-referrer"
         className={cn(
           "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500",
           done && "brightness-90"

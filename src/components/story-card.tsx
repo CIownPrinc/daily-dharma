@@ -1,32 +1,27 @@
 /**
  * StoryCard — story thumbnail card with image shimmer skeleton.
  *
- * Phase 5 change: add shimmer placeholder while Wikimedia images load.
+ * BUG FIX (Phase 5 regression): The previous version called useImageLoad()
+ * at the top level AND again inside the non-featured branch, violating
+ * React's Rules of Hooks. When featured=true, React saw 1 hook call;
+ * when featured=false, it saw 2. This corrupted hook state, causing images
+ * to stay at opacity-0 forever (never firing the onLoad transition).
  *
- * WHY this matters:
- *   All story images are external URLs (Wikimedia CDN). On first visit, or on
- *   a slow connection, the images take 200ms–2s to load. Without a placeholder:
- *     - The card renders at wrong height (no intrinsic size) → layout jump
- *     - The card looks broken with an empty white box
+ * FIX: Both hook calls are now at the top level unconditionally. The
+ * featured branch uses heroStatus/heroImgProps; the compact branch uses
+ * thumbStatus/thumbImgProps. Both hooks always run regardless of `featured`.
  *
- * IMPLEMENTATION:
- *   - useImageLoad hook tracks loaded/error state on the img element
- *   - While loading: parent div gets the .img-shimmer CSS class (defined in
- *     styles.css) which shows a sweeping gradient animation
- *   - On load: shimmer removed, img fades in via opacity transition
- *   - On error: show a subtle lotus placeholder instead of a broken image
- *   - width/height attributes always set → browser reserves correct space
- *     before the image loads (prevents CLS even without shimmer)
- *
- * This pattern is used consistently across StoryCard (featured + compact)
- * and can be reused anywhere an external image needs a graceful load.
+ * Also added referrerPolicy="no-referrer" on all img elements. Wikimedia's
+ * CDN requires either no Referer header or a same-origin one. Some deployment
+ * environments (Lovable, Vercel) send the app origin as Referer, which
+ * Wikimedia's rate-limiter can reject. no-referrer ensures clean requests.
  */
 import { useState } from "react";
+import type { ImgHTMLAttributes } from "react";
 import { Link } from "@tanstack/react-router";
 import type { Story } from "@/lib/dharma-data";
 import { cn } from "@/lib/utils";
 
-/** Track whether an image has finished loading or errored. */
 function useImageLoad() {
   const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
   return {
@@ -34,14 +29,13 @@ function useImageLoad() {
     imgProps: {
       onLoad:  () => setStatus("loaded"),
       onError: () => setStatus("error"),
-    },
+    } as ImgHTMLAttributes<HTMLImageElement>,
   };
 }
 
-/** Fallback shown when an image fails to load. */
 function ImageFallback({ className }: { className?: string }) {
   return (
-    <div className={cn("flex items-center justify-center text-lotus/40 text-3xl", className)}>
+    <div className={cn("flex items-center justify-center text-lotus/40 text-4xl bg-lotus-soft", className)}>
       ✿
     </div>
   );
@@ -56,7 +50,12 @@ export function StoryCard({
   featured?: boolean;
   done?: boolean;
 }) {
+  // Both hooks MUST be called unconditionally at the top level.
+  // featured branch uses hero*, compact branch uses thumb*.
+  // Previously thumb* was called INSIDE the non-featured branch — a Rules of
+  // Hooks violation that caused images to never transition from opacity-0.
   const { status: heroStatus, imgProps: heroImgProps } = useImageLoad();
+  const { status: thumbStatus, imgProps: thumbImgProps } = useImageLoad();
 
   if (featured) {
     return (
@@ -66,19 +65,19 @@ export function StoryCard({
         className="group block bg-card rounded-[2rem] p-3 ring-1 ring-ink/5 shadow-soft hover:shadow-petal transition-shadow"
       >
         <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-stretch bg-gradient-to-br from-card to-lotus-soft rounded-3xl overflow-hidden p-5 md:p-8">
-          {/* Featured image with shimmer */}
           <div className={cn(
             "md:w-1/2 aspect-[4/3] rounded-2xl overflow-hidden ring-1 ring-ink/5 shrink-0",
             heroStatus === "loading" && "img-shimmer",
           )}>
             {heroStatus === "error" ? (
-              <ImageFallback className="w-full h-full bg-lotus-soft" />
+              <ImageFallback className="w-full h-full" />
             ) : (
               <img
                 src={story.image}
                 alt={story.title}
                 width={1024}
                 height={768}
+                referrerPolicy="no-referrer"
                 className={cn(
                   "w-full h-full object-cover transition-all duration-700 group-hover:scale-105",
                   heroStatus === "loaded" ? "opacity-100" : "opacity-0",
@@ -87,7 +86,6 @@ export function StoryCard({
               />
             )}
           </div>
-
           <div className="md:w-1/2 flex flex-col items-start justify-center">
             <div className="px-3 py-1 bg-card text-lotus text-[11px] font-bold uppercase tracking-widest rounded-full ring-1 ring-ink/5 mb-4">
               Today's Tale · {story.duration}
@@ -105,22 +103,18 @@ export function StoryCard({
     );
   }
 
-  // ── Compact card ──────────────────────────────────────────────────────────
-  const { status: thumbStatus, imgProps: thumbImgProps } = useImageLoad();
-
   return (
     <Link
       to="/story/$slug"
       params={{ slug: story.slug }}
       className="group block bg-card rounded-3xl p-3 ring-1 ring-ink/5 shadow-soft hover:shadow-petal transition-shadow relative"
     >
-      {/* Thumbnail with shimmer */}
       <div className={cn(
         "aspect-[4/3] rounded-2xl overflow-hidden mb-4 relative",
         thumbStatus === "loading" && "img-shimmer",
       )}>
         {thumbStatus === "error" ? (
-          <ImageFallback className="w-full h-full bg-lotus-soft" />
+          <ImageFallback className="w-full h-full" />
         ) : (
           <img
             src={story.image}
@@ -128,6 +122,7 @@ export function StoryCard({
             width={1024}
             height={768}
             loading="lazy"
+            referrerPolicy="no-referrer"
             className={cn(
               "w-full h-full object-cover transition-all duration-700 group-hover:scale-105",
               thumbStatus === "loaded" ? "opacity-100" : "opacity-0",
@@ -135,12 +130,9 @@ export function StoryCard({
             {...thumbImgProps}
           />
         )}
-
-        {/* Age stage badge — always visible */}
         <span className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-widest bg-card/90 text-ink-soft px-2 py-0.5 rounded-full ring-1 ring-ink/5 backdrop-blur-sm">
           {story.ageStage}
         </span>
-
         {done && (
           <span
             className="absolute top-2 right-2 size-7 rounded-full bg-leaf text-primary-foreground flex items-center justify-center text-xs font-bold shadow-petal"
@@ -150,7 +142,6 @@ export function StoryCard({
           </span>
         )}
       </div>
-
       <div className="px-3 pb-3">
         <div className="text-[11px] font-bold uppercase tracking-widest text-lotus mb-1">
           {story.realm} · {story.duration}

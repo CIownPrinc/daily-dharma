@@ -171,6 +171,7 @@ function SanctuaryPage() {
                   <div className="size-14 rounded-xl overflow-hidden shrink-0 bg-lotus-soft">
                     <img
                       src={s.image}
+                      referrerPolicy="no-referrer"
                       alt=""
                       width={56}
                       height={56}
@@ -216,6 +217,7 @@ function SanctuaryPage() {
                 <div className="aspect-square rounded-xl overflow-hidden bg-lotus-soft mb-2">
                   <img
                     src={s.image}
+                      referrerPolicy="no-referrer"
                     alt={s.title}
                     width={1024}
                     height={768}

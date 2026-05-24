@@ -188,7 +188,7 @@ function ParentDashboard() {
                   {/* Story header with image */}
                   <div className="flex items-center gap-3 p-4 border-b border-border/50">
                     <div className="size-12 rounded-xl overflow-hidden shrink-0 bg-lotus-soft">
-                      <img src={s.image} alt="" width={48} height={48} loading="lazy" className="w-full h-full object-cover" />
+                      <img src={s.image} alt="" width={48} height={48} loading="lazy" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="text-[10px] font-bold uppercase tracking-widest text-lotus mb-0.5">
