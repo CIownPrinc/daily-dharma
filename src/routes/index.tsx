@@ -19,8 +19,6 @@ import { AppShell } from "@/components/app-shell";
 import { StoryCard } from "@/components/story-card";
 import { MissionCard } from "@/components/mission-card";
 import { ChantCard } from "@/components/chant-card";
-import { StreakBadge } from "@/components/streak-badge";
-import { LevelCard } from "@/components/level-card";
 import { OmBreathing } from "@/components/om-breathing";
 import { stories, missions, chants } from "@/lib/dharma-data";
 import { useProfile } from "@/lib/use-profile";

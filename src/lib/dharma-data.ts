@@ -835,3 +835,74 @@ export const journey: { realm: string; nodes: JourneyNode[] }[] = [
   { realm: "The Quiet Hermitage", nodes: [{ storySlug: "sage-and-the-river", label: "The River" }] },
   { realm: "The Eternal Sky", nodes: [{ storySlug: "dhruva-and-the-pole-star", label: "The Pole Star" }, { storySlug: "nachiketas-questions", label: "The Question" }, { storySlug: "markandeya-and-time", label: "The River of Time" }] },
 ];
+
+// ─── DISCUSSION PROMPTS ───────────────────────────────────────────────────────
+/**
+ * Per-story discussion prompts for the parent dashboard.
+ * Co-located with story data so adding a new story means adding its prompts
+ * in one place, not hunting across route files.
+ *
+ * Structure: 2 specific prompts + 1 universal prompt per story (max 3).
+ * Specific prompts follow recall → connection → extension structure.
+ */
+const DISCUSSION_PROMPTS: Record<string, string[]> = {
+  "boy-who-held-the-mountain": [
+    "Can you show me a time today when you protected or helped someone?",
+    "If you could hold up an umbrella for your whole family, what would you protect them from?",
+  ],
+  "leap-to-lanka": [
+    "What's one thing you think you can't do — but maybe you secretly can?",
+    "Who helps you remember how strong you are when you forget?",
+  ],
+  "sage-and-the-river": [
+    "Can we sit together for one whole minute and watch something quietly?",
+    "What do you notice when you stop being busy and just listen?",
+  ],
+  "rama-and-the-deer": [
+    "What's one promise you'd like to make this week — and keep?",
+    "Was there a moment today when you were kind even when no one was watching?",
+  ],
+  "ganesha-and-the-mouse": [
+    "Is there someone in your life who people might overlook — but who matters to you?",
+    "How does it feel when someone notices you, even when you're small or quiet?",
+  ],
+  "arjunas-choice": [
+    "Did you face a hard choice today? What did your heart tell you?",
+    "What does 'doing what is right' mean to you right now?",
+  ],
+  "draupadis-courage": [
+    "Was there a moment today when you wanted to speak up but didn't? What stopped you?",
+    "What would you say if you were as brave as Draupadi?",
+  ],
+  "eklavyas-practice": [
+    "What's something you'd love to get really good at, even if no one teaches you?",
+    "Can we practice something together for 10 minutes this week?",
+  ],
+  "savitri-and-the-stars": [
+    "What's the biggest question you've been wondering about lately?",
+    "If you could ask a wise person anything, what would you ask?",
+  ],
+  "prahlads-faith": [
+    "What's something you love so much it makes you feel brave?",
+    "How do you stay yourself when someone tries to change you?",
+  ],
+  "dhruva-and-the-pole-star": [
+    "What's one quiet thing you could do every day this week?",
+    "What do you want to be steady and reliable about — like the Pole Star?",
+  ],
+  "nachiketas-questions": [
+    "What's a big question you've been wondering about — even if it's scary to ask?",
+    "What matters more to you: understanding something true, or getting something you want?",
+  ],
+  "markandeya-and-time": [
+    "Who do you love so much that you'd hold on to them forever?",
+    "What does 'love is stronger than time' mean to you?",
+  ],
+};
+
+/** Returns up to 3 discussion prompts for a story (2 specific + 1 universal). */
+export function getDiscussionPrompts(slug: string, characterName: string): string[] {
+  const specific = DISCUSSION_PROMPTS[slug] ?? [];
+  const universal = `What was your favorite moment in ${characterName}'s story, and why?`;
+  return [...specific, universal].slice(0, 3);
+}

@@ -13,7 +13,7 @@ import { ParentGate } from "@/components/parent-gate";
 import { useProgress } from "@/lib/use-progress";
 import { useProfile } from "@/lib/use-profile";
 import { useDharmaStore } from "@/lib/store";
-import { stories } from "@/lib/dharma-data";
+import { stories, getDiscussionPrompts } from "@/lib/dharma-data";
 import { getLevel } from "@/lib/levels";
 
 export const Route = createFileRoute("/parents")({
@@ -232,7 +232,7 @@ function ParentDashboard() {
                         Ask {firstName}
                       </div>
                       <ul className="text-sm text-ink space-y-1.5 list-disc list-inside marker:text-lotus">
-                        {discussionPrompts(s.slug, s.character.name).map((q, i) => (
+                        {getDiscussionPrompts(s.slug, s.character.name).map((q, i) => (
                           <li key={i}>{q}</li>
                         ))}
                       </ul>
@@ -275,67 +275,4 @@ function Stat({ label, value }: { label: string; value: number | string }) {
   );
 }
 
-/**
- * Discussion prompts are co-located with story slugs here.
- * Each story gets 1-2 specific prompts + 1 universal prompt.
- * Blueprint recommendation: recall / connection / extension structure.
- */
-function discussionPrompts(slug: string, character: string): string[] {
-  const specific: Record<string, string[]> = {
-    "boy-who-held-the-mountain": [
-      "Can you show me a time today when you protected or helped someone?",
-      "If you could hold up an umbrella for your whole family, what would you protect them from?",
-    ],
-    "leap-to-lanka": [
-      "What's one thing you think you can't do — but maybe you secretly can?",
-      "Who helps you remember how strong you are when you forget?",
-    ],
-    "sage-and-the-river": [
-      "Can we sit together for one whole minute and watch something quietly?",
-      "What do you notice when you stop being busy and just listen?",
-    ],
-    "rama-and-the-deer": [
-      "What's one promise you'd like to make this week — and keep?",
-      "Was there a moment today when you were kind even when no one was watching?",
-    ],
-    "ganesha-and-the-mouse": [
-      "Is there someone in your life who people might overlook — but who matters to you?",
-      "How does it feel when someone notices you, even when you're small or quiet?",
-    ],
-    "arjunas-choice": [
-      "Did you face a hard choice today? What did your heart tell you?",
-      "What does 'doing what is right' mean to you right now?",
-    ],
-    "draupadis-courage": [
-      "Was there a moment today when you wanted to speak up but didn't? What stopped you?",
-      "What would you say if you were as brave as Draupadi?",
-    ],
-    "eklavyas-practice": [
-      "What's something you'd love to get really good at, even if no one teaches you?",
-      "Can we practice something together for 10 minutes this week?",
-    ],
-    "savitri-and-the-stars": [
-      "What's the biggest question you've been wondering about lately?",
-      "If you could ask a wise person anything, what would you ask?",
-    ],
-    "prahlads-faith": [
-      "What's something you love so much it makes you feel brave?",
-      "How do you stay yourself when someone tries to change you?",
-    ],
-    "dhruva-and-the-pole-star": [
-      "What's one quiet thing you could do every day this week?",
-      "What do you want to be steady and reliable about — like the Pole Star?",
-    ],
-    "nachiketas-questions": [
-      "What's a big question you've been wondering about — even if it's scary to ask?",
-      "What matters more to you: understanding something true, or getting something you want?",
-    ],
-    "markandeya-and-time": [
-      "Who do you love so much that you'd hold on to them forever?",
-      "What does 'love is stronger than time' mean to you?",
-    ],
-  };
 
-  const universal = `What was your favorite moment in ${character}'s story, and why?`;
-  return [...(specific[slug] ?? []), universal].slice(0, 3);
-}

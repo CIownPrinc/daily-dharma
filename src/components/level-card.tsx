@@ -44,8 +44,8 @@ export function LevelCard() {
           {level.next === null
             ? "Path complete ✿"
             : level.index === 0
-              ? "Disciple"
-              : "Dharma Keeper"}
+              ? "Disciple →"
+              : "Dharma Keeper →"}
         </span>
       </div>
     </div>
